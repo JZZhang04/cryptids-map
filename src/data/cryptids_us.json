@@ -1,0 +1,163 @@
+[
+  {
+    "name": "Jersey Devil",
+    "location": "Pine Barrens, New Jersey",
+    "coords": [39.750, -74.500],
+    "description": "出没于新泽西松林荒原，外形怪异，常被描述为有翅膀和蹄子的恶魔生物。",
+    "category": "Flying"
+  },
+  {
+    "name": "Dover Demon",
+    "location": "Dover, Massachusetts",
+    "coords": [42.250, -71.280],
+    "description": "1977年在马萨诸塞州多佛出现的怪异人形生物，特征是大头、无毛皮肤和发光眼睛。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Bigfoot",
+    "location": "Pacific Northwest",
+    "coords": [47.000, -121.800],
+    "description": "北美最著名的神秘生物，据称是一种大型多毛类人猿，常被目击于美国西北部。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Skinwalker",
+    "location": "Navajo Nation, Southwest",
+    "coords": [36.500, -109.000],
+    "description": "纳瓦霍传说中的巫师或变形者，能化身为动物，被视为极度危险与恐怖的存在。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Mothman",
+    "location": "Point Pleasant, West Virginia",
+    "coords": [38.850, -82.137],
+    "description": "有发光红眼和巨大翅膀的神秘生物，20世纪60年代在西弗吉尼亚州多次被目击。",
+    "category": "Flying"
+  },
+  {
+    "name": "Bunny Man",
+    "location": "Fairfax County, Virginia",
+    "coords": [38.830, -77.300],
+    "description": "传说身穿兔子服装、手持斧头的男子，出没于弗吉尼亚州费尔法克斯地区的桥附近。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Lizard Man of Scape Ore Swamp",
+    "location": "Bishopville, South Carolina",
+    "coords": [34.220, -80.250],
+    "description": "南卡罗来纳州传说的蜥蜴人，绿色鳞片、红色眼睛，常与沼泽地区联系在一起。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Loveland Frogman",
+    "location": "Loveland, Ohio",
+    "coords": [39.268, -84.263],
+    "description": "据称是一种身高约1米、类人但带青蛙特征的生物，出没于俄亥俄州洛夫兰河畔。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Champ (Lake Champlain Monster)",
+    "location": "Lake Champlain, Vermont/New York",
+    "coords": [44.500, -73.300],
+    "description": "传说居住在尚普兰湖的大型湖怪，类似尼斯湖水怪，自19世纪以来多次被目击。",
+    "category": "Aquatic"
+  },
+  {
+    "name": "Rougarou",
+    "location": "Louisiana Bayous",
+    "coords": [30.000, -91.200],
+    "description": "路易斯安那州沼泽传说中的狼人，源自法裔凯金文化，常被用来吓唬小孩。",
+    "category": "Beast / Monster"
+  },
+  {
+    "name": "Chupacabra",
+    "location": "Texas / Puerto Rico",
+    "coords": [26.000, -98.200],
+    "description": "“吸山羊怪”，最初源自波多黎各，但在德州等南部州也有大量传说，攻击牲畜并吸干血液。",
+    "category": "Beast / Monster"
+  },
+  {
+    "name": "Fresno Nightcrawler",
+    "location": "Fresno, California",
+    "coords": [36.740, -119.787],
+    "description": "加州弗雷斯诺的怪异影像中出现的神秘生物，形似细长的白色裤子，步态奇特。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Beast of Bray Road",
+    "location": "Elkhorn, Wisconsin",
+    "coords": [42.670, -88.550],
+    "description": "威斯康星州的狼人传说，常被描述为半人半狼的怪物，出没在乡间道路。",
+    "category": "Beast / Monster"
+  },
+  {
+    "name": "Flatwoods Monster",
+    "location": "Flatwoods, West Virginia",
+    "coords": [38.724, -80.639],
+    "description": "1952年在西弗吉尼亚州出现的UFO/外星人相关传说，生物有发光眼睛和奇怪头盔。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Thunderbird",
+    "location": "Midwest & Alaska",
+    "coords": [46.729, -94.685],
+    "description": "美洲原住民传说中的巨大鸟类，翼展可达数米，据称在中西部和阿拉斯加都有目击。",
+    "category": "Flying"
+  },
+  {
+    "name": "Goatman",
+    "location": "Prince George’s County, Maryland",
+    "coords": [38.830, -76.850],
+    "description": "半人半山羊的怪物，传说常持斧游荡，马里兰州传说中最著名的都市怪谈之一。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Ozark Howler",
+    "location": "Ozark Mountains, Arkansas/Missouri",
+    "coords": [36.000, -93.000],
+    "description": "奥扎克山脉传说的黑色野兽，特征是发光的红眼和可怕的嚎叫。",
+    "category": "Beast / Monster"
+  },
+  {
+    "name": "Hopkinsville Goblins",
+    "location": "Hopkinsville, Kentucky",
+    "coords": [36.865, -87.488],
+    "description": "1955年传说一群小型外星人/妖精在肯塔基州袭击农舍，成为著名UFO事件之一。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Van Meter Visitor",
+    "location": "Van Meter, Iowa",
+    "coords": [41.530, -93.950],
+    "description": "1903年爱荷华州的翼状怪物传说，身躯巨大，眼睛会发光。",
+    "category": "Flying"
+  },
+  {
+    "name": "Enfield Horror",
+    "location": "Enfield, Illinois",
+    "coords": [38.100, -88.350],
+    "description": "1973年伊利诺伊州出现的奇怪三足生物，红眼、怪叫，曾引起广泛恐慌。",
+    "category": "Humanoid"
+  },
+  {
+    "name": "Altamaha-ha",
+    "location": "Altamaha River, Georgia",
+    "coords": [31.200, -81.500],
+    "description": "乔治亚州的河怪，常被描述为类似蛇颈龙的水生生物。",
+    "category": "Aquatic"
+  },
+  {
+    "name": "Honey Island Swamp Monster",
+    "location": "Louisiana",
+    "coords": [30.300, -89.700],
+    "description": "路易斯安那州传说的沼泽怪物，常被形容为半人半兽。",
+    "category": "Beast / Monster"
+  },
+  {
+    "name": "White River Monster",
+    "location": "Newport, Arkansas",
+    "coords": [35.600, -91.300],
+    "description": "阿肯色州白河水怪，早在20世纪初就有目击报告。",
+    "category": "Aquatic"
+  }
+]
