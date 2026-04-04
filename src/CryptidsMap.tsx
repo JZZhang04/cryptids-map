@@ -1,13 +1,17 @@
 import React, { useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
 import L, { type LatLngExpression, Icon } from "leaflet";
-import creatures from "./data/cryptids_us.json";
+import { useQuery } from "@apollo/client/react";
+import { GET_CREATURES } from "./graphql/queries";
+import CreatureDrawer from "./CreatureDrawer";
+import type { Creature } from "./types";
 
-// 🔹 定义可选主题类型
+// Map theme options
 type ThemeType = "light" | "dark" | "gray";
 
-// 🟢 分类颜色
+// Category colors
 const categoryColors: Record<string, string> = {
     Humanoid: "violet",
     Aquatic: "blue",
@@ -15,7 +19,7 @@ const categoryColors: Record<string, string> = {
     "Beast / Monster": "red",
 };
 
-// 🟢 创建彩色图标
+// Create colored marker icon
 function createIcon(color: string) {
     return new Icon({
         iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
@@ -28,7 +32,7 @@ function createIcon(color: string) {
     });
 }
 
-// 🟢 图例组件
+// Legend component
 const Legend = () => {
     const [collapsed, setCollapsed] = useState(false);
 
@@ -60,7 +64,7 @@ const Legend = () => {
                     marginBottom: collapsed ? "0" : "8px",
                 }}
             >
-                {collapsed ? "▶ 展开图例" : "▼ 收起图例"}
+                {collapsed ? "▶ Legend" : "▼ Legend"}
             </button>
 
             {!collapsed && (
@@ -86,23 +90,25 @@ const Legend = () => {
     );
 };
 
-// 🟢 搜索控件
+// Search & filter controls
 const Controls = ({
     selected,
     setSelected,
     onSearch,
+    allCreatures,
 }: {
     selected: string;
     setSelected: (val: string) => void;
     onSearch: (query: string) => void;
+    allCreatures: Creature[];
 }) => {
     const [query, setQuery] = useState("");
-    const [suggestions, setSuggestions] = useState<typeof creatures>([]);
+    const [suggestions, setSuggestions] = useState<Creature[]>([]);
 
     const handleChange = (val: string) => {
         setQuery(val);
         if (val.length > 0) {
-            const matches = creatures.filter((c) =>
+            const matches = allCreatures.filter((c) =>
                 c.name.toLowerCase().includes(val.toLowerCase())
             );
             setSuggestions(matches.slice(0, 6));
@@ -127,63 +133,76 @@ const Controls = ({
         <div
             style={{
                 position: "fixed",
-                top: "20px",
-                left: "20px",
+                top: "16px",
+                left: "50%",
+                transform: "translateX(-50%)",
                 zIndex: 1000,
-                background: "rgba(255,255,255,0.95)",
-                padding: "10px",
-                borderRadius: "6px",
+                background: "rgba(10,10,10,0.92)",
+                padding: "10px 14px",
+                borderRadius: "10px",
                 fontSize: "14px",
-                width: "260px",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.5)",
+                minWidth: "480px",
             }}
         >
-            <div style={{ marginBottom: "6px" }}>
-                分类：
-                <select
-                    value={selected}
-                    onChange={(e) => setSelected(e.target.value)}
-                    style={{ marginLeft: "4px", width: "140px" }}
-                >
-                    <option value="All">全部</option>
-                    {Object.keys(categoryColors).map((cat) => (
-                        <option key={cat} value={cat}>
-                            {cat}
-                        </option>
-                    ))}
-                </select>
-            </div>
+            {/* Category filter */}
+            <select
+                value={selected}
+                onChange={(e) => setSelected(e.target.value)}
+                style={{
+                    padding: "7px 10px",
+                    borderRadius: "6px",
+                    border: "1px solid #444",
+                    backgroundColor: "#1e1e1e",
+                    color: "#eee",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                }}
+            >
+                <option value="All">All Categories</option>
+                {Object.keys(categoryColors).map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                ))}
+            </select>
 
-            <div style={{ position: "relative" }}>
+            {/* Search input */}
+            <div style={{ position: "relative", flex: 1 }}>
                 <input
                     type="text"
-                    placeholder="搜索生物名..."
+                    placeholder="Search creature name..."
                     value={query}
                     onChange={(e) => handleChange(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                     style={{
-                        padding: "6px",
+                        padding: "7px 36px 7px 10px",
                         width: "100%",
-                        borderRadius: "4px",
-                        border: "1px solid #555",
-                        backgroundColor: "rgba(0,0,0,0.85)",
-                        color: "white",
+                        boxSizing: "border-box",
+                        borderRadius: "6px",
+                        border: "1px solid #444",
+                        backgroundColor: "#1e1e1e",
+                        color: "#eee",
+                        fontSize: "13px",
                         outline: "none",
                     }}
                 />
-
                 <button
                     onClick={handleSubmit}
                     style={{
                         position: "absolute",
-                        right: "4px",
-                        top: "4px",
-                        padding: "4px 6px",
-                        fontSize: "12px",
+                        right: "6px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "transparent",
+                        border: "none",
+                        color: "#aaa",
                         cursor: "pointer",
-                        borderRadius: "4px",
-                        border: "1px solid #555",
-                        backgroundColor: "rgba(0,0,0,0.85)",
-                        color: "white",
+                        fontSize: "14px",
+                        padding: "0",
+                        lineHeight: 1,
                     }}
                 >
                     🔍
@@ -193,19 +212,20 @@ const Controls = ({
                     <ul
                         style={{
                             position: "absolute",
-                            top: "36px",
+                            top: "calc(100% + 6px)",
                             left: 0,
                             right: 0,
-                            background: "rgba(0,0,0,0.85)",
-                            color: "white",
-                            border: "1px solid #ccc",
-                            borderRadius: "4px",
-                            maxHeight: "150px",
+                            background: "#1a1a1a",
+                            color: "#eee",
+                            border: "1px solid #444",
+                            borderRadius: "6px",
+                            maxHeight: "200px",
                             overflowY: "auto",
                             margin: 0,
                             padding: "4px",
                             listStyle: "none",
                             zIndex: 1100,
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
                         }}
                     >
                         {suggestions.map((c) => (
@@ -213,13 +233,13 @@ const Controls = ({
                                 key={c.name}
                                 onClick={() => handleSelect(c.name)}
                                 style={{
-                                    padding: "6px",
+                                    padding: "7px 10px",
                                     cursor: "pointer",
                                     borderRadius: "4px",
+                                    fontSize: "13px",
                                 }}
                                 onMouseEnter={(e) =>
-                                (e.currentTarget.style.backgroundColor =
-                                    "rgba(255,255,255,0.2)")
+                                    (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)")
                                 }
                                 onMouseLeave={(e) =>
                                     (e.currentTarget.style.backgroundColor = "transparent")
@@ -235,7 +255,7 @@ const Controls = ({
     );
 };
 
-// 🟢 Hook：执行飞到目标并打开 Popup
+// Hook: fly to target and open popup
 function FlyToAndOpen({
     coords,
     markerRef,
@@ -259,38 +279,41 @@ export default function CryptidsMap() {
     const [flyCoords, setFlyCoords] = useState<LatLngExpression | null>(null);
     const [activeMarker, setActiveMarker] =
         useState<React.RefObject<L.Marker | null> | null>(null);
-    const [theme, setTheme] = useState<ThemeType>("light"); // ✅ 初始主题
+    const [theme, setTheme] = useState<ThemeType>("light");
+    const [drawerCreature, setDrawerCreature] = useState<Creature | null>(null);
 
-    // 🟢 Marker refs
-    const markerRefs = useRef<Record<string, React.RefObject<L.Marker | null>>>(
-        {}
-    );
-    creatures.forEach((c) => {
+    // 🟢 GraphQL query — fetch all creatures
+    const { data, loading, error } = useQuery<{ creatures: Creature[] }>(GET_CREATURES);
+    const allCreatures: Creature[] = data?.creatures ?? [];
+
+    // Marker refs
+    const markerRefs = useRef<Record<string, React.RefObject<L.Marker | null>>>({});
+    allCreatures.forEach((c) => {
         if (!markerRefs.current[c.name]) {
             markerRefs.current[c.name] = React.createRef<L.Marker | null>();
         }
     });
 
-    // 🟢 根据筛选过滤
+    // Filter creatures by category
     const filteredCreatures =
         filter === "All"
-            ? creatures
-            : creatures.filter((c) => c.category === filter);
+            ? allCreatures
+            : allCreatures.filter((c) => c.category === filter);
 
-    // 🟢 搜索功能
+    // Search handler
     const handleSearch = (query: string) => {
-        const match = creatures.find(
+        const match = allCreatures.find(
             (c) => c.name.toLowerCase() === query.toLowerCase()
         );
         if (match) {
             setFlyCoords(match.coords as LatLngExpression);
             setActiveMarker(markerRefs.current[match.name]);
         } else {
-            alert("未找到该生物");
+            alert("Creature not found.");
         }
     };
 
-    // 🔹 主题配置
+    // Theme tile config
     const themes: Record<ThemeType, {
         url: string;
         attribution: string;
@@ -314,7 +337,8 @@ export default function CryptidsMap() {
         },
     };
 
-
+    if (loading) return <div style={{ padding: 40, color: "#fff", background: "#111", height: "100vh" }}>Loading creatures...</div>;
+    if (error) return <div style={{ padding: 40, color: "red" }}>Error: {error.message}</div>;
 
     return (
         <div style={{ height: "100vh", width: "100%" }}>
@@ -329,43 +353,46 @@ export default function CryptidsMap() {
                     {...(themes[theme].subdomains ? { subdomains: themes[theme].subdomains } : {})}
                 />
 
-                {/* 渲染 Marker */}
-                {filteredCreatures.map((c) => {
-                    const color = categoryColors[c.category] || "grey";
-                    return (
-                        <Marker
-                            key={c.name}
-                            position={c.coords as LatLngExpression}
-                            icon={createIcon(color)}
-                            ref={markerRefs.current[c.name]}
-                        >
-                            <Popup>
-                                <h3>{c.name}</h3>
-                                <p>
-                                    <b>地点：</b>
+                {/* Render markers */}
+                <MarkerClusterGroup chunkedLoading>
+                    {filteredCreatures.map((c) => {
+                        const color = categoryColors[c.category] || "grey";
+                        return (
+                            <Marker
+                                key={c.name}
+                                position={c.coords as LatLngExpression}
+                                icon={createIcon(color)}
+                                ref={markerRefs.current[c.name]}
+                                eventHandlers={{
+                                    click: () => setDrawerCreature(c),
+                                }}
+                            >
+                                <Popup>
+                                    <b>{c.name}</b><br />
                                     {c.location}
-                                </p>
-                                <p>{c.description}</p>
-                                <p>
-                                    <i>分类：{c.category}</i>
-                                </p>
-                            </Popup>
-                        </Marker>
-                    );
-                })}
+                                </Popup>
+                            </Marker>
+                        );
+                    })}
+                </MarkerClusterGroup>
 
-                {/* 飞到目标并打开 Popup */}
+                {/* Fly to searched creature */}
                 <FlyToAndOpen coords={flyCoords} markerRef={activeMarker} />
             </MapContainer>
 
-            {/* 控件 & 图例 */}
+            {/* Controls & legend */}
             <Controls
                 selected={filter}
                 setSelected={setFilter}
                 onSearch={handleSearch}
+                allCreatures={allCreatures}
             />
             <Legend />
-            {/* 🔹 主题切换按钮 */}
+            <CreatureDrawer
+                creature={drawerCreature}
+                onClose={() => setDrawerCreature(null)}
+            />
+            {/* Theme selector */}
             <div style={{ position: "fixed", top: "20px", right: "20px", zIndex: 1100 }}>
                 <select
                     value={theme}
@@ -378,9 +405,9 @@ export default function CryptidsMap() {
                         cursor: "pointer",
                     }}
                 >
-                    <option value="light">🌍 亮色</option>
-                    <option value="gray">🌫️ 灰色</option>
-                    <option value="dark">🌙 暗色</option>
+                    <option value="light">🌍 Light</option>
+                    <option value="gray">🌫️ Gray</option>
+                    <option value="dark">🌙 Dark</option>
                 </select>
             </div>
         </div>
