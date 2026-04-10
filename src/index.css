@@ -36,6 +36,11 @@ html, body, #root {
   padding: 0;
 }
 
+/* Crosshair cursor when picking map coordinates */
+.picking-mode .leaflet-container {
+  cursor: crosshair !important;
+}
+
 body {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

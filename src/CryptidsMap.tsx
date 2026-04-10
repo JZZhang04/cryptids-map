@@ -1,11 +1,13 @@
 import React, { useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
 import L, { type LatLngExpression, Icon } from "leaflet";
 import { useQuery } from "@apollo/client/react";
 import { GET_CREATURES } from "./graphql/queries";
 import CreatureDrawer from "./CreatureDrawer";
+import AddCreatureModal from "./AddCreatureModal";
+import CryptidListPanel from "./CryptidListPanel";
 import type { Creature } from "./types";
 
 // Map theme options
@@ -37,40 +39,18 @@ const Legend = () => {
     const [collapsed, setCollapsed] = useState(false);
 
     return (
-        <div
-            style={{
-                position: "fixed",
-                bottom: "20px",
-                left: "20px",
-                background: "rgba(0,0,0,0.7)",
-                color: "white",
-                borderRadius: "8px",
-                fontSize: "14px",
-                zIndex: 1000,
-                padding: "8px",
-                minWidth: "160px",
-            }}
-        >
+        <div className="map-legend header-panel">
             <button
                 onClick={() => setCollapsed(!collapsed)}
-                style={{
-                    background: "transparent",
-                    border: "1px solid #aaa",
-                    color: "white",
-                    width: "100%",
-                    padding: "4px",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    marginBottom: collapsed ? "0" : "8px",
-                }}
+                className="map-legend-toggle"
             >
                 {collapsed ? "▶ Legend" : "▼ Legend"}
             </button>
 
             {!collapsed && (
-                <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                <ul className="map-legend-list">
                     {Object.entries(categoryColors).map(([cat, color]) => (
-                        <li key={cat} style={{ marginBottom: "4px" }}>
+                        <li key={cat} className="map-legend-item">
                             <span
                                 style={{
                                     display: "inline-block",
@@ -78,7 +58,8 @@ const Legend = () => {
                                     height: "12px",
                                     backgroundColor: color,
                                     borderRadius: "50%",
-                                    marginRight: "6px",
+                                    marginRight: "8px",
+                                    boxShadow: "0 0 0 2px rgba(255, 248, 232, 0.08)",
                                 }}
                             ></span>
                             {cat}
@@ -130,38 +111,12 @@ const Controls = ({
     };
 
     return (
-        <div
-            style={{
-                position: "fixed",
-                top: "16px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                zIndex: 1000,
-                background: "rgba(10,10,10,0.92)",
-                padding: "10px 14px",
-                borderRadius: "10px",
-                fontSize: "14px",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.5)",
-                minWidth: "480px",
-            }}
-        >
+        <div className="map-controls header-panel">
             {/* Category filter */}
             <select
                 value={selected}
                 onChange={(e) => setSelected(e.target.value)}
-                style={{
-                    padding: "7px 10px",
-                    borderRadius: "6px",
-                    border: "1px solid #444",
-                    backgroundColor: "#1e1e1e",
-                    color: "#eee",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                    flexShrink: 0,
-                }}
+                className="map-control-select"
             >
                 <option value="All">All Categories</option>
                 {Object.keys(categoryColors).map((cat) => (
@@ -170,76 +125,31 @@ const Controls = ({
             </select>
 
             {/* Search input */}
-            <div style={{ position: "relative", flex: 1 }}>
+            <div className="map-control-search">
                 <input
                     type="text"
                     placeholder="Search creature name..."
                     value={query}
                     onChange={(e) => handleChange(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                    style={{
-                        padding: "7px 36px 7px 10px",
-                        width: "100%",
-                        boxSizing: "border-box",
-                        borderRadius: "6px",
-                        border: "1px solid #444",
-                        backgroundColor: "#1e1e1e",
-                        color: "#eee",
-                        fontSize: "13px",
-                        outline: "none",
-                    }}
+                    className="map-control-input"
                 />
                 <button
                     onClick={handleSubmit}
-                    style={{
-                        position: "absolute",
-                        right: "6px",
-                        top: "50%",
-                        transform: "translateY(-50%)",
-                        background: "transparent",
-                        border: "none",
-                        color: "#aaa",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        padding: "0",
-                        lineHeight: 1,
-                    }}
+                    className="map-control-search-button"
                 >
                     🔍
                 </button>
 
                 {suggestions.length > 0 && (
-                    <ul
-                        style={{
-                            position: "absolute",
-                            top: "calc(100% + 6px)",
-                            left: 0,
-                            right: 0,
-                            background: "#1a1a1a",
-                            color: "#eee",
-                            border: "1px solid #444",
-                            borderRadius: "6px",
-                            maxHeight: "200px",
-                            overflowY: "auto",
-                            margin: 0,
-                            padding: "4px",
-                            listStyle: "none",
-                            zIndex: 1100,
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.4)",
-                        }}
-                    >
+                    <ul className="map-control-suggestions">
                         {suggestions.map((c) => (
                             <li
                                 key={c.name}
                                 onClick={() => handleSelect(c.name)}
-                                style={{
-                                    padding: "7px 10px",
-                                    cursor: "pointer",
-                                    borderRadius: "4px",
-                                    fontSize: "13px",
-                                }}
+                                className="map-control-suggestion"
                                 onMouseEnter={(e) =>
-                                    (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)")
+                                    (e.currentTarget.style.backgroundColor = "rgba(240, 193, 95, 0.12)")
                                 }
                                 onMouseLeave={(e) =>
                                     (e.currentTarget.style.backgroundColor = "transparent")
@@ -254,6 +164,24 @@ const Controls = ({
         </div>
     );
 };
+
+// Hook: capture map click when picking coordinates
+function MapClickHandler({
+    enabled,
+    onPick,
+}: {
+    enabled: boolean;
+    onPick: (coords: [number, number]) => void;
+}) {
+    useMapEvents({
+        click(e) {
+            if (enabled) {
+                onPick([parseFloat(e.latlng.lat.toFixed(4)), parseFloat(e.latlng.lng.toFixed(4))]);
+            }
+        },
+    });
+    return null;
+}
 
 // Hook: fly to target and open popup
 function FlyToAndOpen({
@@ -273,14 +201,78 @@ function FlyToAndOpen({
     return null;
 }
 
+function LeftToolGroup({
+    theme,
+    setTheme,
+}: {
+    theme: ThemeType;
+    setTheme: (theme: ThemeType) => void;
+}) {
+    const map = useMap();
+
+    return (
+        <div className="left-tool-group header-panel">
+            <div className="left-tool-section">
+                <select
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value as ThemeType)}
+                    className="theme-switcher-select"
+                    aria-label="Map theme"
+                >
+                    <option value="light">🌍 Light</option>
+                    <option value="gray">🌫️ Gray</option>
+                    <option value="dark">🌙 Dark</option>
+                </select>
+            </div>
+
+            <div className="left-tool-divider" />
+
+            <div className="left-tool-section left-tool-zoom">
+                <button
+                    type="button"
+                    className="left-tool-button"
+                    onClick={() => map.zoomIn()}
+                    aria-label="Zoom in"
+                >
+                    +
+                </button>
+                <button
+                    type="button"
+                    className="left-tool-button"
+                    onClick={() => map.zoomOut()}
+                    aria-label="Zoom out"
+                >
+                    −
+                </button>
+            </div>
+        </div>
+    );
+}
+
 export default function CryptidsMap() {
     const usaCenter: LatLngExpression = [39.8283, -98.5795];
+    const worldBounds = L.latLngBounds(
+        L.latLng(-85, -180),
+        L.latLng(85, 180)
+    );
     const [filter, setFilter] = useState("All");
     const [flyCoords, setFlyCoords] = useState<LatLngExpression | null>(null);
     const [activeMarker, setActiveMarker] =
         useState<React.RefObject<L.Marker | null> | null>(null);
     const [theme, setTheme] = useState<ThemeType>("light");
     const [drawerCreature, setDrawerCreature] = useState<Creature | null>(null);
+    const [userCreatures, setUserCreatures] = useState<Creature[]>(() => {
+        try {
+            const saved = localStorage.getItem("userCreatures");
+            return saved ? (JSON.parse(saved) as Creature[]) : [];
+        } catch {
+            return [];
+        }
+    });
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showListPanel, setShowListPanel] = useState(false);
+    const [isPicking, setIsPicking] = useState(false);
+    const [pickedCoords, setPickedCoords] = useState<[number, number] | null>(null);
 
     // 🟢 GraphQL query — fetch all creatures
     const { data, loading, error } = useQuery<{ creatures: Creature[] }>(GET_CREATURES);
@@ -337,19 +329,49 @@ export default function CryptidsMap() {
         },
     };
 
+    const handleSelectFromList = (creature: Creature) => {
+        setFlyCoords(creature.coords as LatLngExpression);
+        setActiveMarker(markerRefs.current[creature.name] ?? null);
+        setDrawerCreature(creature);
+    };
+
+    const handleAddCreature = (creature: Creature) => {
+        setUserCreatures((prev) => {
+            const updated = [...prev, creature];
+            localStorage.setItem("userCreatures", JSON.stringify(updated));
+            return updated;
+        });
+    };
+
+    const handlePickStart = () => {
+        setShowAddModal(false);
+        setIsPicking(true);
+    };
+
+    const handleMapPick = (coords: [number, number]) => {
+        setPickedCoords(coords);
+        setIsPicking(false);
+        setShowAddModal(true);
+    };
+
     if (loading) return <div style={{ padding: 40, color: "#fff", background: "#111", height: "100vh" }}>Loading creatures...</div>;
     if (error) return <div style={{ padding: 40, color: "red" }}>Error: {error.message}</div>;
 
     return (
-        <div style={{ height: "100vh", width: "100%" }}>
+        <div className={isPicking ? "picking-mode" : ""} style={{ height: "100vh", width: "100%" }}>
             <MapContainer
                 center={usaCenter}
                 zoom={4}
+                zoomControl={false}
+                maxBounds={worldBounds}
+                maxBoundsViscosity={1.0}
+                worldCopyJump={false}
                 style={{ height: "100%", width: "100%" }}
             >
                 <TileLayer
                     url={themes[theme].url}
                     attribution={themes[theme].attribution}
+                    noWrap
                     {...(themes[theme].subdomains ? { subdomains: themes[theme].subdomains } : {})}
                 />
 
@@ -378,7 +400,39 @@ export default function CryptidsMap() {
 
                 {/* Fly to searched creature */}
                 <FlyToAndOpen coords={flyCoords} markerRef={activeMarker} />
+                <LeftToolGroup theme={theme} setTheme={setTheme} />
+
+                {/* Map click handler for coordinate picking */}
+                <MapClickHandler enabled={isPicking} onPick={handleMapPick} />
+
+                {/* User-added creature markers */}
+                <MarkerClusterGroup chunkedLoading>
+                    {userCreatures.map((c, i) => {
+                        const color = categoryColors[c.category] || "grey";
+                        return (
+                            <Marker
+                                key={`user-${i}-${c.name}`}
+                                position={c.coords as LatLngExpression}
+                                icon={createIcon(color)}
+                                eventHandlers={{ click: () => setDrawerCreature(c) }}
+                            >
+                                <Popup><b>{c.name}</b><br />{c.location}</Popup>
+                            </Marker>
+                        );
+                    })}
+                </MarkerClusterGroup>
             </MapContainer>
+
+            {/* Logo */}
+            <div className="map-brand header-panel">
+                <div className="map-brand-title">
+                    <span className="map-brand-title-primary">Cryptids</span>
+                    <span className="map-brand-title-secondary">Field Guide</span>
+                </div>
+                <span className="map-brand-subtitle">
+                    Sightings, Legends, and Lore
+                </span>
+            </div>
 
             {/* Controls & legend */}
             <Controls
@@ -392,24 +446,42 @@ export default function CryptidsMap() {
                 creature={drawerCreature}
                 onClose={() => setDrawerCreature(null)}
             />
-            {/* Theme selector */}
-            <div style={{ position: "fixed", top: "20px", right: "20px", zIndex: 1100 }}>
-                <select
-                    value={theme}
-                    onChange={(e) => setTheme(e.target.value as ThemeType)}
-                    style={{
-                        padding: "6px",
-                        borderRadius: "6px",
-                        border: "1px solid #555",
-                        backgroundColor: "#fff",
-                        cursor: "pointer",
-                    }}
+            {/* Bottom-right action buttons */}
+            <div className="map-actions header-panel">
+                <button
+                    onClick={() => setShowListPanel(true)}
+                    className="map-actions-button"
                 >
-                    <option value="light">🌍 Light</option>
-                    <option value="gray">🌫️ Gray</option>
-                    <option value="dark">🌙 Dark</option>
-                </select>
+                    All Cryptids
+                </button>
+                <button
+                    onClick={() => { setPickedCoords(null); setShowAddModal(true); }}
+                    title="Add a new creature"
+                    className="map-actions-add"
+                >
+                    +
+                </button>
             </div>
+
+            {/* All Cryptids list panel */}
+            <CryptidListPanel
+                isOpen={showListPanel}
+                allCreatures={allCreatures}
+                userCreatures={userCreatures}
+                onSelect={handleSelectFromList}
+                onClose={() => setShowListPanel(false)}
+            />
+
+            {/* Add creature modal */}
+            {showAddModal && (
+                <AddCreatureModal
+                    onAdd={handleAddCreature}
+                    onClose={() => { setShowAddModal(false); setIsPicking(false); }}
+                    pickedCoords={pickedCoords}
+                    onStartPicking={handlePickStart}
+                    isPicking={isPicking}
+                />
+            )}
         </div>
     );
 }

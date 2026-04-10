@@ -3,70 +3,70 @@
         "name": "Jersey Devil",
         "location": "Pine Barrens, New Jersey",
         "coords": [
-            39.750,
-            -74.500
+            39.75,
+            -74.5
         ],
-        "description": "出没于新泽西松林荒原，外形怪异，常被描述为有翅膀和蹄子的恶魔生物。",
+        "description": "A legendary creature said to haunt the Pine Barrens of New Jersey, often described as a winged, hoofed devil-like beast.",
         "category": "Flying"
     },
     {
         "name": "Dover Demon",
         "location": "Dover, Massachusetts",
         "coords": [
-            42.250,
-            -71.280
+            42.25,
+            -71.28
         ],
-        "description": "1977年在马萨诸塞州多佛出现的怪异人形生物，特征是大头、无毛皮肤和发光眼睛。",
+        "description": "A strange humanoid creature reportedly seen in Dover, Massachusetts, in 1977, known for its large head, hairless body, and glowing eyes.",
         "category": "Humanoid"
     },
     {
         "name": "Bigfoot",
         "location": "Pacific Northwest",
         "coords": [
-            47.000,
-            -121.800
+            47.0,
+            -121.8
         ],
-        "description": "北美最著名的神秘生物，据称是一种大型多毛类人猿，常被目击于美国西北部。",
+        "description": "North America's best-known cryptid, usually described as a large, hairy ape-like humanoid sighted throughout the Pacific Northwest.",
         "category": "Humanoid"
     },
     {
         "name": "Skinwalker",
         "location": "Navajo Nation, Southwest",
         "coords": [
-            36.500,
-            -109.000
+            36.5,
+            -109.0
         ],
-        "description": "纳瓦霍传说中的巫师或变形者，能化身为动物，被视为极度危险与恐怖的存在。",
+        "description": "A feared figure from Navajo tradition, often described as a dangerous witch or shapeshifter capable of taking animal form.",
         "category": "Humanoid"
     },
     {
         "name": "Mothman",
         "location": "Point Pleasant, West Virginia",
         "coords": [
-            38.850,
+            38.85,
             -82.137
         ],
-        "description": "有发光红眼和巨大翅膀的神秘生物，20世纪60年代在西弗吉尼亚州多次被目击。",
+        "description": "A mysterious winged being with glowing red eyes that was reported many times around Point Pleasant, West Virginia, in the 1960s.",
         "category": "Flying"
     },
     {
         "name": "Bunny Man",
         "location": "Fairfax County, Virginia",
         "coords": [
-            38.830,
-            -77.300
+            38.83,
+            -77.3
         ],
-        "description": "传说身穿兔子服装、手持斧头的男子，出没于弗吉尼亚州费尔法克斯地区的桥附近。",
+        "description": "A local Virginia legend about a rabbit-suited figure carrying an axe and appearing near a bridge in Fairfax County.",
         "category": "Humanoid"
     },
     {
         "name": "Lizard Man of Scape Ore Swamp",
         "location": "Bishopville, South Carolina",
         "coords": [
-            34.220,
-            -80.250
+            34.22,
+            -80.25
         ],
-        "description": "南卡罗来纳州传说的蜥蜴人，绿色鳞片、红色眼睛，常与沼泽地区联系在一起。",
+        "description": "A reptilian humanoid from South Carolina folklore, usually described as green-scaled, red-eyed, and connected to swamp encounters.",
         "category": "Humanoid"
     },
     {
@@ -76,57 +76,57 @@
             39.268,
             -84.263
         ],
-        "description": "据称是一种身高约1米、类人但带青蛙特征的生物，出没于俄亥俄州洛夫兰河畔。",
+        "description": "An Ohio cryptid said to be a human-sized amphibian creature seen near the river in Loveland.",
         "category": "Humanoid"
     },
     {
         "name": "Champ (Lake Champlain Monster)",
         "location": "Lake Champlain, Vermont/New York",
         "coords": [
-            44.500,
-            -73.300
+            44.5,
+            -73.3
         ],
-        "description": "传说居住在尚普兰湖的大型湖怪，类似尼斯湖水怪，自19世纪以来多次被目击。",
+        "description": "A famous lake monster said to inhabit Lake Champlain, often compared to the Loch Ness Monster and reported since the 19th century.",
         "category": "Aquatic"
     },
     {
         "name": "Rougarou",
         "location": "Louisiana Bayous",
         "coords": [
-            30.000,
-            -91.200
+            30.0,
+            -91.2
         ],
-        "description": "路易斯安那州沼泽传说中的狼人，源自法裔凯金文化，常被用来吓唬小孩。",
+        "description": "A werewolf-like creature from Louisiana bayou folklore rooted in Cajun and French traditions.",
         "category": "Beast / Monster"
     },
     {
         "name": "Chupacabra",
         "location": "Texas / Puerto Rico",
         "coords": [
-            26.000,
-            -98.200
+            26.0,
+            -98.2
         ],
-        "description": "“吸山羊怪”，最初源自波多黎各，但在德州等南部州也有大量传说，攻击牲畜并吸干血液。",
+        "description": "The 'goat-sucker,' a livestock-attacking cryptid associated with Puerto Rico and later widely reported in Texas and the American South.",
         "category": "Beast / Monster"
     },
     {
         "name": "Fresno Nightcrawler",
         "location": "Fresno, California",
         "coords": [
-            36.740,
+            36.74,
             -119.787
         ],
-        "description": "加州弗雷斯诺的怪异影像中出现的神秘生物，形似细长的白色裤子，步态奇特。",
+        "description": "A bizarre figure captured in footage near Fresno, California, appearing like a pair of walking white legs with an unusual gait.",
         "category": "Humanoid"
     },
     {
         "name": "Beast of Bray Road",
         "location": "Elkhorn, Wisconsin",
         "coords": [
-            42.670,
-            -88.550
+            42.67,
+            -88.55
         ],
-        "description": "威斯康星州的狼人传说，常被描述为半人半狼的怪物，出没在乡间道路。",
+        "description": "A werewolf-like monster from Wisconsin folklore, often described as a half-human, half-wolf creature seen on rural roads.",
         "category": "Beast / Monster"
     },
     {
@@ -136,7 +136,7 @@
             38.724,
             -80.639
         ],
-        "description": "1952年在西弗吉尼亚州出现的UFO/外星人相关传说，生物有发光眼睛和奇怪头盔。",
+        "description": "A strange being linked to a 1952 West Virginia UFO event, described as tall, glowing-eyed, and helmet-headed.",
         "category": "Humanoid"
     },
     {
@@ -146,27 +146,27 @@
             46.729,
             -94.685
         ],
-        "description": "美洲原住民传说中的巨大鸟类，翼展可达数米，据称在中西部和阿拉斯加都有目击。",
+        "description": "A gigantic bird from Indigenous traditions, with later reports in the Midwest and Alaska describing an enormous flying creature.",
         "category": "Flying"
     },
     {
         "name": "Goatman",
         "location": "Prince George’s County, Maryland",
         "coords": [
-            38.830,
-            -76.850
+            38.83,
+            -76.85
         ],
-        "description": "半人半山羊的怪物，传说常持斧游荡，马里兰州传说中最著名的都市怪谈之一。",
+        "description": "A half-human, half-goat monster from Maryland folklore, often imagined as an axe-wielding figure roaming at night.",
         "category": "Humanoid"
     },
     {
         "name": "Ozark Howler",
         "location": "Ozark Mountains, Arkansas/Missouri",
         "coords": [
-            36.000,
-            -93.000
+            36.0,
+            -93.0
         ],
-        "description": "奥扎克山脉传说的黑色野兽，特征是发光的红眼和可怕的嚎叫。",
+        "description": "A black beast from the Ozark Mountains known for glowing red eyes and a terrifying howl.",
         "category": "Beast / Monster"
     },
     {
@@ -176,57 +176,57 @@
             36.865,
             -87.488
         ],
-        "description": "1955年传说一群小型外星人/妖精在肯塔基州袭击农舍，成为著名UFO事件之一。",
+        "description": "The creatures from the famous 1955 Kentucky encounter, often described as small alien- or goblin-like beings attacking a farmhouse.",
         "category": "Humanoid"
     },
     {
         "name": "Van Meter Visitor",
         "location": "Van Meter, Iowa",
         "coords": [
-            41.530,
-            -93.950
+            41.53,
+            -93.95
         ],
-        "description": "1903年爱荷华州的翼状怪物传说，身躯巨大，眼睛会发光。",
+        "description": "A flying monster from a 1903 Iowa flap, remembered as a large winged creature with glowing features.",
         "category": "Flying"
     },
     {
         "name": "Enfield Horror",
         "location": "Enfield, Illinois",
         "coords": [
-            38.100,
-            -88.350
+            38.1,
+            -88.35
         ],
-        "description": "1973年伊利诺伊州出现的奇怪三足生物，红眼、怪叫，曾引起广泛恐慌。",
+        "description": "A bizarre red-eyed creature from Illinois folklore, described in 1973 as a strange three-legged being with an eerie cry.",
         "category": "Humanoid"
     },
     {
         "name": "Altamaha-ha",
         "location": "Altamaha River, Georgia",
         "coords": [
-            31.200,
-            -81.500
+            31.2,
+            -81.5
         ],
-        "description": "乔治亚州的河怪，常被描述为类似蛇颈龙的水生生物。",
+        "description": "A river monster from Georgia legend, commonly described as a long-necked aquatic creature living in the Altamaha River.",
         "category": "Aquatic"
     },
     {
         "name": "Honey Island Swamp Monster",
         "location": "Louisiana",
         "coords": [
-            30.300,
-            -89.700
+            30.3,
+            -89.7
         ],
-        "description": "路易斯安那州传说的沼泽怪物，常被形容为半人半兽。",
+        "description": "A Louisiana swamp cryptid often portrayed as a hulking half-human, half-beast creature.",
         "category": "Beast / Monster"
     },
     {
         "name": "White River Monster",
         "location": "Newport, Arkansas",
         "coords": [
-            35.600,
-            -91.300
+            35.6,
+            -91.3
         ],
-        "description": "阿肯色州白河水怪，早在20世纪初就有目击报告。",
+        "description": "An Arkansas lake and river monster reported since the early 20th century in the White River area.",
         "category": "Aquatic"
     },
     {
@@ -236,7 +236,7 @@
             25.2866,
             -80.8987
         ],
-        "description": "佛罗里达州大脚怪的变种，据称散发臭味，因此得名。",
+        "description": "Florida's regional Bigfoot variant, named for the strong odor witnesses say surrounds it.",
         "category": "Humanoid"
     },
     {
@@ -246,7 +246,7 @@
             45.9042,
             -68.9216
         ],
-        "description": "缅因州传说中的巨鸟状灵体，被认为守护卡塔丁山。",
+        "description": "A bird-like spirit from Maine tradition, believed to guard Mount Katahdin.",
         "category": "Flying"
     },
     {
@@ -256,7 +256,7 @@
             44.0,
             -71.5
         ],
-        "description": "高大瘦长、皮肤灰色的人形怪物，出没于新罕布什尔州森林。",
+        "description": "Tall, gray, human-shaped beings said to roam the forests of New Hampshire in regional folklore.",
         "category": "Humanoid"
     },
     {
@@ -266,7 +266,7 @@
             41.2,
             -73.3
         ],
-        "description": "头部异常巨大的人形小怪物，据说在康州森林中活动。",
+        "description": "A New England-style urban legend about small humanoids with oversized heads that appear in rural roads and woods.",
         "category": "Humanoid"
     },
     {
@@ -276,7 +276,7 @@
             41.2,
             -71.6
         ],
-        "description": "幽灵船传说，时常在罗得岛海域出现的神秘光影。",
+        "description": "A mysterious ghost light associated with local legends in New York, often interpreted as a supernatural or cryptid-adjacent phenomenon.",
         "category": "Aquatic"
     },
     {
@@ -286,7 +286,7 @@
             34.54,
             -78.78
         ],
-        "description": "北卡传说中的吸血怪兽，袭击牲畜而闻名。",
+        "description": "A catlike monster from North Carolina lore, blamed for livestock killings and nighttime attacks in the 1950s.",
         "category": "Beast / Monster"
     },
     {
@@ -296,7 +296,7 @@
             34.7,
             -86.6
         ],
-        "description": "白色毛发的神秘怪兽，叫声怪异。",
+        "description": "A pale, fast-moving shaggy beast from northern Alabama folklore, often described as eerie and almost ghostlike.",
         "category": "Beast / Monster"
     },
     {
@@ -306,7 +306,7 @@
             39.5,
             -77.4
         ],
-        "description": "有翼爬行动物传说，常被称为“恐怖鸟龙”。",
+        "description": "A dragon-like creature from Maryland folklore, usually described with wings, claws, and a terrifying screech.",
         "category": "Flying"
     },
     {
@@ -316,7 +316,7 @@
             37.2,
             -76.5
         ],
-        "description": "切萨皮克湾的水怪，类似尼斯湖水怪。",
+        "description": "A sea-serpent-like cryptid associated with Chesapeake Bay sightings.",
         "category": "Aquatic"
     },
     {
@@ -326,7 +326,7 @@
             33.3,
             -93.9
         ],
-        "description": "阿肯色州沼泽怪兽，类似大脚怪。",
+        "description": "A large hairy swamp creature from Arkansas, closely related to southern Bigfoot-style legends.",
         "category": "Beast / Monster"
     },
     {
@@ -336,7 +336,7 @@
             35.5,
             -97.5
         ],
-        "description": "据说生活在淡水湖中的巨型章鱼。",
+        "description": "A lake monster from Oklahoma folklore said to dwell underwater and attack swimmers.",
         "category": "Aquatic"
     },
     {
@@ -346,7 +346,7 @@
             34.3,
             -111.1
         ],
-        "description": "亚利桑那州的大脚怪传说。",
+        "description": "Arizona's Bigfoot-like cryptid, described as a tall, foul-smelling, hairy humanoid of the Mogollon Rim.",
         "category": "Beast / Monster"
     },
     {
@@ -356,7 +356,7 @@
             39.5,
             -106.5
         ],
-        "description": "科罗拉多传说的山地怪兽，会从山顶滑下捕食人类。",
+        "description": "A famous Rocky Mountain fearsome critter said to slide down slopes and swallow whole groups of people or animals.",
         "category": "Beast / Monster"
     },
     {
@@ -366,7 +366,7 @@
             41.9,
             -111.3
         ],
-        "description": "熊湖水怪，外形似蛇或巨鱼。",
+        "description": "A lake monster from the Utah-Idaho border, reported in Bear Lake since the 19th century.",
         "category": "Aquatic"
     },
     {
@@ -376,7 +376,7 @@
             39.1,
             -120.0
         ],
-        "description": "太浩湖怪物，据说外形像蛇颈龙。",
+        "description": "The legendary aquatic creature of Lake Tahoe, often imagined as a long-necked lake monster.",
         "category": "Aquatic"
     },
     {
@@ -386,7 +386,7 @@
             44.9,
             -116.1
         ],
-        "description": "爱达荷州湖怪，昵称“蛇颈龙之类的怪物”。",
+        "description": "Idaho's best-known lake monster, said to live in Payette Lake and resemble a serpentine beast.",
         "category": "Aquatic"
     },
     {
@@ -396,7 +396,7 @@
             46.9,
             -110.4
         ],
-        "description": "类似狼或鬣狗的怪兽，袭击牲畜。",
+        "description": "A strange predator from frontier-era accounts in the northern Plains, usually described as wolf-like but unlike any known animal.",
         "category": "Beast / Monster"
     },
     {
@@ -406,18 +406,8 @@
             47.9,
             -114.1
         ],
-        "description": "另一种湖怪传说。",
+        "description": "Montana's famous lake cryptid, often compared to other North American lake monsters.",
         "category": "Aquatic"
-    },
-    {
-        "name": "Van Meter Visitor",
-        "location": "Iowa",
-        "coords": [
-            41.5,
-            -93.9
-        ],
-        "description": "带翅膀的人形怪物，发光并伴随硫磺味。",
-        "category": "Flying"
     },
     {
         "name": "Michigan Dogman",
@@ -426,7 +416,7 @@
             44.3,
             -85.6
         ],
-        "description": "密歇根州狼人传说，有蓝眼睛和嚎叫声。",
+        "description": "A dog- or wolf-like cryptid from Michigan folklore, said to walk upright and possess humanlike menace.",
         "category": "Humanoid"
     },
     {
@@ -436,7 +426,7 @@
             39.0,
             -91.5
         ],
-        "description": "密苏里版大脚怪，毛发浓密。",
+        "description": "The Missouri Monster, a hairy humanoid cryptid reported near the Mississippi River region in the 1970s.",
         "category": "Beast / Monster"
     },
     {
@@ -446,7 +436,7 @@
             47.5,
             -94.9
         ],
-        "description": "源自阿尔冈昆传说的贪婪怪物，与食人有关。",
+        "description": "A terrifying cannibal spirit or monster from Algonquian tradition, later often represented in popular cryptid culture as a gaunt humanoid creature.",
         "category": "Humanoid"
     },
     {
@@ -456,7 +446,7 @@
             46.2,
             -122.2
         ],
-        "description": "有翅膀的类人怪兽，火山爆发后被目击。",
+        "description": "A winged cryptid from Washington State, often described as a bat-like creature with primate features near Mount St. Helens.",
         "category": "Flying"
     },
     {
@@ -466,7 +456,7 @@
             44.6,
             -124.1
         ],
-        "description": "俄勒冈海怪，长达40英尺的蛇形怪物。",
+        "description": "A giant sea serpent said to inhabit the waters near Oregon's coast.",
         "category": "Aquatic"
     },
     {
@@ -476,7 +466,7 @@
             70.0,
             -150.0
         ],
-        "description": "阿拉斯加海蛇，体长可达15米。",
+        "description": "An enormous sea-serpent-like creature from Alaska Native tradition, said to live in cold northern waters.",
         "category": "Aquatic"
     },
     {
@@ -486,7 +476,7 @@
             58.3,
             -134.4
         ],
-        "description": "水獭人，传说会引诱渔民走向死亡。",
+        "description": "A dangerous shapeshifting being from Tlingit tradition in southeast Alaska, often described as part otter and part human.",
         "category": "Humanoid"
     },
     {
@@ -496,17 +486,7 @@
             21.3,
             -157.8
         ],
-        "description": "夏威夷传说的小人族，擅长建造工程。",
-        "category": "Humanoid"
-    },
-    {
-        "name": "Hopkinsville Goblins",
-        "location": "Kentucky",
-        "coords": [
-            36.9,
-            -87.5
-        ],
-        "description": "1955年小镇居民报告的小外星人或怪物袭击。",
+        "description": "The legendary small people of Hawaiian folklore, said to be master builders who work in secret.",
         "category": "Humanoid"
     },
     {
@@ -516,7 +496,7 @@
             47.5,
             -100.5
         ],
-        "description": "虽以加拿大著称，但在北达也有类似湖怪传说。",
+        "description": "A famous long-bodied lake monster of the Pacific Northwest cultural sphere, often described as serpentine and elusive.",
         "category": "Aquatic"
     },
     {
@@ -526,7 +506,7 @@
             43.0,
             -107.5
         ],
-        "description": "著名的鹿角兔，西部幽默传说的产物。",
+        "description": "A playful Western folklore creature imagined as a jackrabbit with antelope horns.",
         "category": "Humanoid"
     },
     {
@@ -536,7 +516,7 @@
             39.0,
             -96.8
         ],
-        "description": "堪萨斯河中的水怪传说。",
+        "description": "A large water cryptid said to inhabit stretches of the Kansas River in local legend.",
         "category": "Aquatic"
     },
     {
@@ -546,241 +526,327 @@
             41.5,
             -99.9
         ],
-        "description": "碱湖怪兽，长有短腿和鳞片。",
+        "description": "A regional lake monster from Nebraska folklore, associated with isolated waters and strange sightings.",
         "category": "Aquatic"
     },
     {
         "name": "Shennongjia Wildman (神农架野人)",
-        "location": "Shennongjia, Hubei",
+        "location": "Shennongjia Forest District, Hubei, China",
         "coords": [
-            31.500,
-            110.300
+            31.5,
+            110.3
         ],
-        "description": "20世纪以来最著名的“野人”传闻地，目击多为大型类人型、全身多毛；官方与民间多次科考，未获确证。",
-        "category": "Humanoid",
-        "region": "China",
-        "era": "Modern (20th–21st c.)",
-        "source": "https://www.cae.cn/cae/html/main/col57/column_57_1.html"
+        "description": "A Chinese wildman tradition from Shennongjia, describing a large, ape-like humanoid said to roam remote forests.",
+        "category": "Humanoid"
     },
     {
         "name": "Kanas Lake Monster (喀纳斯湖‘大红鱼’)",
-        "location": "Kanas Lake, Altay, Xinjiang",
+        "location": "Kanas Lake, Altay Prefecture, Xinjiang, China",
         "coords": [
-            48.700,
-            87.000
+            48.7,
+            87.0
         ],
-        "description": "长期有巨型生物搅动湖面的报道；中科院与科普媒体多次解读，主流解释为大型哲罗鲑等巨型鱼类造成的视觉效应。",
-        "category": "Aquatic",
-        "region": "China",
-        "era": "Modern (20th–21st c.)",
-        "source": "https://www.cae.cn/cae/html/main/col57/2022-09/16/20220916114543609436057_1.html"
+        "description": "A monster tradition from Kanas Lake in Xinjiang, often tied to giant reddish fish-like beings seen in deep water.",
+        "category": "Aquatic"
     },
     {
         "name": "Tianchi Monster (长白山天池水怪)",
-        "location": "Heaven Lake, Changbai Mountain, Jilin",
+        "location": "Heaven Lake, Changbai Mountain, Jilin, China",
         "coords": [
             42.006,
             128.055
         ],
-        "description": "自清末地方志与笔记即有记述，1960s–1980s有多次目击报告；形态多被描述为“大头、颈长、体硕”。也有鳟鱼、翻车鱼等自然解释。",
-        "category": "Aquatic",
-        "region": "China",
-        "era": "Qing record → Modern sightings",
-        "source": "https://zh.wikipedia.org/wiki/%E5%A4%A9%E6%B1%A0%E6%B0%B4%E6%80%AA"
+        "description": "A long-running lake monster legend from Heaven Lake on Changbai Mountain, with reports describing a large unknown aquatic animal.",
+        "category": "Aquatic"
     },
     {
         "name": "Qinghai Lake Monster (青海湖水怪)",
-        "location": "Qinghai Lake, Qinghai",
+        "location": "Qinghai Lake, Qinghai, China",
         "coords": [
-            36.900,
-            100.100
+            36.9,
+            100.1
         ],
-        "description": "1950年代起有“十余米长黑色生物”目击报道；科普界多持审慎/自然现象解释，如大型鱼类、波浪叠加、光学误差等。",
-        "category": "Aquatic",
-        "region": "China",
-        "era": "Modern (1950s–)",
-        "source": "https://zh.wikipedia.org/wiki/%E9%9D%92%E6%B5%B7%E6%B9%96%E6%B0%B4%E6%80%AA"
+        "description": "A lake monster tradition from Qinghai Lake, usually described as a large unidentified creature seen breaking the water's surface.",
+        "category": "Aquatic"
     },
     {
         "name": "Jingpo Lake Monster (镜泊湖水怪)",
-        "location": "Jingpo Lake, Heilongjiang",
+        "location": "Jingpo Lake, Heilongjiang, China",
         "coords": [
-            44.100,
-            128.900
+            44.1,
+            128.9
         ],
-        "description": "1970年代以来多次“巨物翻浪”与“喷涌”目击，2006年有游客称拍到影像；也有风浪叠加、鱼群等解释。",
-        "category": "Aquatic",
-        "region": "China",
-        "era": "Modern (1970s–)",
-        "source": "https://news.sina.com.cn/c/2006-08-06/11159671798s.shtml"
+        "description": "A northeastern Chinese lake monster legend associated with unusual large aquatic sightings in Jingpo Lake.",
+        "category": "Aquatic"
     },
     {
         "name": "‘Laoye Temple’ Waters Phenomena (鄱阳湖老爷庙水域异常浪涌/水怪传说)",
-        "location": "Poyang Lake, Jiangxi",
+        "location": "Laoye Temple Waters, Poyang Lake, Jiangxi, China",
         "coords": [
-            29.500,
-            116.000
+            29.5,
+            116.0
         ],
-        "description": "老爷庙一带素称“中国百慕大”，多起沉船与异常浪涌被民间解读为“水怪”；媒体调查也指出水文/风场等自然成因的可能性。",
-        "category": "Aquatic",
-        "region": "China",
-        "era": "Modern (20th–21st c.)",
-        "source": "https://news.sina.com.cn/s/2019-05-17/doc-ihvhiqax9241634.shtml"
+        "description": "A cluster of strange-water and monster legends from the Laoye Temple waters of Poyang Lake, long linked to disappearances, sudden waves, and unexplained danger.",
+        "category": "Aquatic"
     },
     {
         "name": "Shuihouzi (水猴子)",
-        "location": "Lower Yangtze & Dongting/Tai Lake region (多地传闻)",
+        "location": "Lower Yangtze and Dongting-Tai Lake region, China",
         "coords": [
-            29.200,
-            112.900
+            29.2,
+            112.9
         ],
-        "description": "民间传说中的淡水两栖“怪猿”或“水狮鬼”；多与溺亡、河湖事故叙事纠缠，学者视为民俗叙事与水患风险的文化投射。",
-        "category": "Beast / Monster",
-        "region": "China",
-        "era": "Qing–Modern folklore",
-        "source": "https://zh.wikipedia.org/zh-hans/%E6%B0%B4%E7%8C%B4%E5%AD%90"
+        "description": "A Chinese water-spirit cryptid often blamed for drownings, usually imagined as a lurking aquatic humanoid that drags people underwater.",
+        "category": "Beast / Monster"
     },
     {
         "name": "Three-Legged Beast (三足兽)",
-        "location": "Changbai Mountain area (长白山)",
+        "location": "Changbai Mountain region, Jilin, China",
         "coords": [
-            42.100,
-            127.300
+            42.1,
+            127.3
         ],
-        "description": "清末笔记《清稗类钞·动物类》载：长白山“有三足兽，形如狸，前二足后一直足，行即跳跃”。",
-        "category": "Beast / Monster",
-        "region": "China",
-        "era": "Qing (late)",
-        "source": "https://ctext.org/wiki.pl?chapter=530918&if=gb"
+        "description": "A strange three-legged beast from classical Chinese anecdotal lore, remembered as an uncanny and ominous animal.",
+        "category": "Beast / Monster"
     },
     {
         "name": "Flying Fox (飞狐，非蝙蝠)",
-        "location": "North of the Great Wall (口外密林一带，今冀北/晋北)",
+        "location": "North of the Great Wall, Hebei-Shanxi border region, China",
         "coords": [
-            39.840,
-            114.550
+            39.84,
+            114.55
         ],
-        "description": "《清稗类钞·动物类》称“形似狐，肉翅连四足及尾，能飞但能下不能上”，典型的笔记式奇兽记述。",
-        "category": "Flying",
-        "region": "China",
-        "era": "Qing (late)",
-        "source": "https://ctext.org/wiki.pl?chapter=530918&if=gb"
+        "description": "A fox-like flying creature from classical strange-tales literature, distinct from the real-world bat sometimes called a flying fox.",
+        "category": "Flying"
     },
     {
         "name": "Fruit-Leopard (果下豹)",
-        "location": "Luofu Mountain, Huizhou, Guangdong",
+        "location": "Mount Luofu, Huizhou, Guangdong, China",
         "coords": [
-            23.280,
-            114.050
+            23.28,
+            114.05
         ],
-        "description": "《清稗类钞》载“罗浮山巅有兽，小如猕猴，名果下豹”，或为对灵猫/小型兽类的民俗称谓与夸饰。",
-        "category": "Beast / Monster",
-        "region": "China",
-        "era": "Qing (late)",
-        "source": "https://zh.wikisource.org/zh-hans/%E6%B8%85%E7%A8%97%E9%A1%9E%E9%88%94/098"
+        "description": "A miniature leopard-like beast from old Chinese records, notable for its unusually small body and exotic reputation.",
+        "category": "Beast / Monster"
     },
     {
         "name": "Sea Monk (海和尚)",
-        "location": "Bohai & Yellow Sea coast (渤黄海沿岸多地传见)",
+        "location": "Bohai and Yellow Sea coast, China",
         "coords": [
-            36.100,
-            120.300
+            36.1,
+            120.3
         ],
-        "description": "清代笔记《子不语·卷十八》目录有“海和尚”条，常被描述为海中僧状怪物；或为对海豹/海象等外来图像的想象性转述。",
-        "category": "Aquatic",
-        "region": "China",
-        "era": "Qing (mid-late)",
-        "source": "https://zh.wikisource.org/wiki/%E5%AD%90%E4%B8%8D%E8%AA%9E/%E5%8D%B718"
+        "description": "A monk-like sea cryptid from Chinese anecdotal lore, blending marine imagery with supernatural storytelling.",
+        "category": "Aquatic"
     },
     {
         "name": "One-legged Serpent (一足蛇)",
-        "location": "Lower Yangtze region (江浙一带传闻)",
+        "location": "Lower Yangtze region, China",
         "coords": [
-            30.300,
-            120.200
+            30.3,
+            120.2
         ],
-        "description": "《子不语·卷十八》目录载“一足蛇”，异于常理的蛇类志怪，近似对畸形/片段目击的文学化记述。",
-        "category": "Beast / Monster",
-        "region": "China",
-        "era": "Qing (mid-late)",
-        "source": "https://zh.wikisource.org/wiki/%E5%AD%90%E4%B8%8D%E8%AA%9E/%E5%8D%B718"
+        "description": "A one-legged snake-like creature from traditional Chinese strange-tales, remembered as an unnatural and ominous beast.",
+        "category": "Beast / Monster"
     },
     {
         "name": "Earth-Burrow Beast (土窟异兽)",
-        "location": "North China loess caves (华北黄土窟窿一带传闻)",
+        "location": "Loess cave region of North China",
         "coords": [
-            35.000,
-            109.000
+            35.0,
+            109.0
         ],
-        "description": "《子不语·卷十八》条目，叙述“土窟异兽”潜伏地穴出没，为明清笔记中的地下怪兽母题之一。",
-        "category": "Beast / Monster",
-        "region": "China",
-        "era": "Qing (mid-late)",
-        "source": "https://zh.wikisource.org/wiki/%E5%AD%90%E4%B8%8D%E8%AA%9E/%E5%8D%B718"
+        "description": "A subterranean cryptid from Qing-era writings, described as a strange beast lurking in caves or earthen burrows.",
+        "category": "Beast / Monster"
     },
     {
         "name": "Dongting Lake ‘Water Ape’ Cluster (洞庭湖水怪/水猴子传说群)",
-        "location": "Dongting Lake, Hunan",
+        "location": "Dongting Lake, Hunan, China",
         "coords": [
-            29.070,
-            112.980
+            29.07,
+            112.98
         ],
-        "description": "洞庭一带“水猴子/水怪”叙事尤盛，常与溺亡事件、祭祀与水文风险相联系；属民俗志怪与现实的交织。",
-        "category": "Aquatic",
-        "region": "China",
-        "era": "Qing–Modern",
-        "source": "https://zh.wikipedia.org/zh-hans/%E6%B0%B4%E7%8C%B4%E5%AD%90"
+        "description": "A cluster of water-monster and water-ape stories from Dongting Lake, where folklore often merges with the dangers of river and lake travel.",
+        "category": "Aquatic"
     },
     {
         "name": "Qiangtang Plateau ‘Yeti’ Reports (羌塘/藏区雪人/野人报告)",
-        "location": "Ngari–Qiangtang, Tibet",
+        "location": "Ngari and Qiangtang Plateau, Tibet, China",
         "coords": [
-            33.500,
-            81.000
+            33.5,
+            81.0
         ],
-        "description": "青藏高原北部的不明足迹、大型灵长目击零星见诸媒体与科考随记，证据多为轶闻或足迹照片，未获确证。",
-        "category": "Humanoid",
-        "region": "China",
-        "era": "Modern (20th–21st c.)",
-        "source": "https://news.sciencenet.cn/sbhtmlnews/2013/12/281268.shtm"
+        "description": "Modern reports from the Tibetan Plateau about unknown large humanoids or 'wild men,' often compared to the Yeti.",
+        "category": "Humanoid"
     },
     {
         "name": "Yingkou Fallen Dragon (营口坠龙)",
-        "location": "Yingkou, Liaoning",
+        "location": "Yingkou, Liaoning, China",
         "coords": [
-            40.670,
-            122.230
+            40.67,
+            122.23
         ],
-        "description": "1934年辽宁营口传出“巨龙坠地”事件，民间有大量观者口述称见到类似巨型鱼鳞状怪物搁浅路边并死亡，媒体也曾报道，但被认为可能是鲸鱼或鲨鱼尸体的误传。",
-        "category": "Beast / Monster",
-        "region": "China",
-        "era": "Republic of China (1930s)",
-        "source": "https://zh.wikipedia.org/wiki/%E8%90%A5%E5%8F%A3%E5%9D%A0%E9%BE%99"
+        "description": "The famous 1934 Yingkou incident in which witnesses claimed that a dragon-like creature fell to earth, though later explanations suggested a beached marine animal.",
+        "category": "Beast / Monster"
     },
     {
         "name": "Donkey-Headed Wolf (驴头狼)",
-        "location": "Hubei Province, China",
+        "location": "Hubei, China",
         "coords": [
-            31.000,
-            112.000
+            31.0,
+            112.0
         ],
-        "description": "湖北地区的民间传说异兽，形似驴头、狼身，夜间出没，传说会伤人或掏心。常被认为是对野兽或未知猛兽的夸张化想象。",
-        "category": "Beast / Monster",
-        "region": "China",
-        "era": "Late Qing – Modern folklore",
-        "source": "https://baike.baidu.com/item/%E9%A9%B4%E5%A4%B4%E7%8B%BC/8238222"
+        "description": "A folkloric beast from Chinese regional legend, described as having a donkey's head and a wolf's body and appearing at night.",
+        "category": "Beast / Monster"
     },
     {
         "name": "Red Willow Child (红柳娃)",
-        "location": "Taklamakan Desert fringes, Xinjiang",
+        "location": "Taklamakan Desert fringe, Xinjiang, China",
         "coords": [
-            39.000,
-            84.000
+            39.0,
+            84.0
         ],
-        "description": "新疆民间传说中的神秘小型生物，常被描述为生活在红柳丛中、形似幼童，带有异样声音。近现代多为口头传说，缺乏实证，学者常解释为环境险象的拟人化。",
-        "category": "Humanoid",
-        "region": "China",
-        "era": "Modern folklore (20th–21st c.)",
-        "source": "https://baike.baidu.com/item/%E7%BA%A2%E6%9F%B3%E5%A8%83/10884748"
+        "description": "A small mysterious being from Xinjiang folklore, said to dwell among red willow thickets and associated with eerie sounds and desert mystery.",
+        "category": "Humanoid"
+    },
+    {
+        "name": "Pukwudgie",
+        "location": "Bridgewater Triangle, Massachusetts",
+        "coords": [
+            41.93,
+            -71.1
+        ],
+        "description": "A small but dangerous trickster being from Northeastern Indigenous and regional folklore, often tied to the Bridgewater Triangle.",
+        "category": "Humanoid"
+    },
+    {
+        "name": "Glawackus",
+        "location": "Glastonbury, Connecticut",
+        "coords": [
+            41.712,
+            -72.608
+        ],
+        "description": "A Connecticut cryptid described as an eerie mix of cat, dog, and bear seen at night in rural areas.",
+        "category": "Beast / Monster"
+    },
+    {
+        "name": "Lake Worth Monster",
+        "location": "Fort Worth, Texas",
+        "coords": [
+            32.829,
+            -97.492
+        ],
+        "description": "A Texas monster legend centered on a half-human, half-goat creature reported around Lake Worth.",
+        "category": "Beast / Monster"
+    },
+    {
+        "name": "Pressie (Presque Isle Monster)",
+        "location": "Presque Isle Bay, Pennsylvania",
+        "coords": [
+            42.14,
+            -80.085
+        ],
+        "description": "A Pennsylvania lake monster associated with Presque Isle Bay and often compared to other famous aquatic cryptids.",
+        "category": "Aquatic"
+    },
+    {
+        "name": "Wampus Cat",
+        "location": "Appalachian Mountains, Tennessee",
+        "coords": [
+            35.9,
+            -83.9
+        ],
+        "description": "A monstrous wild cat from Appalachian folklore, known for glowing eyes and terrifying nighttime appearances.",
+        "category": "Beast / Monster"
+    },
+    {
+        "name": "Big Muddy Monster",
+        "location": "Murphysboro, Illinois",
+        "coords": [
+            37.764,
+            -89.336
+        ],
+        "description": "A Southern Illinois hairy humanoid cryptid whose sightings made it one of the Midwest's classic Bigfoot-like legends.",
+        "category": "Humanoid"
+    },
+    {
+        "name": "Thetor",
+        "location": "Bourbon County, Kansas",
+        "coords": [
+            37.84,
+            -94.85
+        ],
+        "description": "A Kansas folklore creature described as a huge reptilian or dragon-like beast seen near rivers and rural roads.",
+        "category": "Beast / Monster"
+    },
+    {
+        "name": "Elkhorn Lake Monster",
+        "location": "Elkhorn, Nebraska",
+        "coords": [
+            41.285,
+            -96.235
+        ],
+        "description": "A Nebraska regional lake monster, usually described as a large shadowy or serpentine creature in the water.",
+        "category": "Aquatic"
+    },
+    {
+        "name": "Monster of Pocomoonshine Lake",
+        "location": "Pocomoonshine Lake, Maine",
+        "coords": [
+            45.533,
+            -67.804
+        ],
+        "description": "A serpent-like lake monster from rural Maine folklore associated with isolated northern waters.",
+        "category": "Aquatic"
+    },
+    {
+        "name": "Block Island Sea Serpent",
+        "location": "Block Island, Rhode Island",
+        "coords": [
+            41.17,
+            -71.558
+        ],
+        "description": "A Rhode Island sea-serpent legend with 19th-century reports of a gigantic snake-like marine creature.",
+        "category": "Aquatic"
+    },
+    {
+        "name": "Gloucester Sea Serpent",
+        "location": "Cape Ann, Massachusetts",
+        "coords": [
+            42.615,
+            -70.662
+        ],
+        "description": "One of New England's most famous sea-serpent traditions, centered on repeated reports off Gloucester and Cape Ann.",
+        "category": "Aquatic"
+    },
+    {
+        "name": "Moon-Eyed People",
+        "location": "Appalachian Georgia",
+        "coords": [
+            34.7,
+            -83.7
+        ],
+        "description": "A mysterious pale, large-eyed people from Appalachian legend in Georgia, said to avoid sunlight.",
+        "category": "Humanoid"
+    },
+    {
+        "name": "Letiche",
+        "location": "New Orleans, Louisiana",
+        "coords": [
+            29.951,
+            -90.072
+        ],
+        "description": "A Louisiana folkloric monster from French-Creole tradition, often imagined as a bizarre winged or shapeshifting night creature.",
+        "category": "Flying"
+    },
+    {
+        "name": "Mississippi River Monster",
+        "location": "Tunica, Mississippi",
+        "coords": [
+            34.684,
+            -90.382
+        ],
+        "description": "A large aquatic cryptid said to inhabit stretches of the Mississippi River and appear as a dark, serpentine beast.",
+        "category": "Aquatic"
     }
 ]
