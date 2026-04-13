@@ -62,7 +62,9 @@ function App() {
           <h1>What are cryptids?</h1>
           <p className="portal-intro">
             Cryptids are creatures from folklore, eyewitness reports, and local legends that
-            people debate but science has not fully verified. This map collects famous sightings,
+            people debate but science has not fully verified. Most are best understood as fictional
+            stories, misidentifications, eyewitness bias, or later retellings of regional folklore
+            rather than scientifically confirmed animals. This map collects famous sightings,
             regional mysteries, and modern monster stories across the country.
           </p>
 
