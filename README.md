@@ -6,13 +6,6 @@ A map-based field journal for folklore, monster stories, regional sightings, and
 
 ![Cryptids Field Guide screenshot](docs/cryptids-field-guide-screenshot.png)
 
-Place your homepage screenshot at `docs/cryptids-field-guide-screenshot.png`.
-
-Best results usually come from a capture that includes:
-
-- the black-and-gold field guide header
-- the map with clustered markers visible
-- the session panel or migration UI in view
 
 This project turns the United States (and the whole world later)into a browsable cryptid atlas: part campfire archive, part interactive map, part playful reminder that not every “eyewitness account” should be mistaken for zoology. Most cryptids are best understood as folklore, misidentification, exaggeration, or cultural storytelling rather than scientifically verified animals, and this app leans into that mystery with curiosity instead of pretending to be a lab report.
 
