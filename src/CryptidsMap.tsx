@@ -1,14 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
 import L, { type LatLngExpression, Icon } from "leaflet";
 import { useQuery } from "@apollo/client/react";
+import { supabase } from "./supabase";
 import { GET_CREATURES } from "./graphql/queries";
 import CreatureDrawer from "./CreatureDrawer";
 import AddCreatureModal from "./AddCreatureModal";
 import CryptidListPanel from "./CryptidListPanel";
-import type { Creature } from "./types";
+import type { Creature, UserCryptidRow } from "./types";
 
 // Map theme options
 type ThemeType = "light" | "dark" | "gray";
@@ -20,6 +21,9 @@ const categoryColors: Record<string, string> = {
     Flying: "orange",
     "Beast / Monster": "red",
 };
+const ALLOWED_CATEGORIES = new Set(Object.keys(categoryColors));
+const MAX_NAME_LENGTH = 80;
+const MAX_DESCRIPTION_LENGTH = 600;
 
 // Create colored marker icon
 function createIcon(color: string) {
@@ -249,7 +253,29 @@ function LeftToolGroup({
     );
 }
 
-export default function CryptidsMap() {
+function createLocalCreatureId() {
+    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+        return `local-${crypto.randomUUID()}`;
+    }
+
+    return `local-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function normalizeLocalCreature(creature: Creature): Creature {
+    return {
+        ...creature,
+        id: creature.id ?? createLocalCreatureId(),
+        source: "user",
+        visibility: creature.visibility ?? "private",
+    };
+}
+
+type CryptidsMapProps = {
+    isGuest?: boolean;
+    refreshToken?: number;
+};
+
+export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: CryptidsMapProps) {
     const usaCenter: LatLngExpression = [39.8283, -98.5795];
     const worldBounds = L.latLngBounds(
         L.latLng(-85, -180),
@@ -261,28 +287,180 @@ export default function CryptidsMap() {
         useState<React.RefObject<L.Marker | null> | null>(null);
     const [theme, setTheme] = useState<ThemeType>("light");
     const [drawerCreature, setDrawerCreature] = useState<Creature | null>(null);
-    const [userCreatures, setUserCreatures] = useState<Creature[]>(() => {
-        try {
-            const saved = localStorage.getItem("userCreatures");
-            return saved ? (JSON.parse(saved) as Creature[]) : [];
-        } catch {
-            return [];
-        }
-    });
+    const [userCreatures, setUserCreatures] = useState<Creature[]>([]);
+    const [publicCreatures, setPublicCreatures] = useState<Creature[]>([]);
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [editingCreature, setEditingCreature] = useState<Creature | null>(null);
     const [showListPanel, setShowListPanel] = useState(false);
     const [isPicking, setIsPicking] = useState(false);
     const [pickedCoords, setPickedCoords] = useState<[number, number] | null>(null);
+    const [isLoadingUserCreatures, setIsLoadingUserCreatures] = useState(true);
+    const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+    const [pendingDeleteCreature, setPendingDeleteCreature] = useState<Creature | null>(null);
+
+    useEffect(() => {
+        if (!feedbackMessage) {
+            return;
+        }
+
+        const timeoutId = window.setTimeout(() => {
+            setFeedbackMessage(null);
+        }, 2600);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [feedbackMessage]);
+
+    useEffect(() => {
+        const loadUserCreatures = async () => {
+            const guestMode = localStorage.getItem("cryptidsGuestMode") === "true";
+
+            if (!supabase) {
+                try {
+                    const saved = localStorage.getItem("userCreatures");
+                    const parsed = saved ? (JSON.parse(saved) as Creature[]) : [];
+                    const normalized = parsed.map(normalizeLocalCreature);
+                    setUserCreatures(normalized);
+                    setPublicCreatures([]);
+                    setCurrentUserId(null);
+                    localStorage.setItem("userCreatures", JSON.stringify(normalized));
+                } catch {
+                    setUserCreatures([]);
+                    setPublicCreatures([]);
+                    setCurrentUserId(null);
+                } finally {
+                    setIsLoadingUserCreatures(false);
+                }
+                return;
+            }
+
+            if (guestMode) {
+                try {
+                    const saved = localStorage.getItem("userCreatures");
+                    const parsed = saved ? (JSON.parse(saved) as Creature[]) : [];
+                    const normalized = parsed.map(normalizeLocalCreature);
+                    setUserCreatures(normalized);
+                    setCurrentUserId(null);
+                    localStorage.setItem("userCreatures", JSON.stringify(normalized));
+                } catch {
+                    setUserCreatures([]);
+                    setCurrentUserId(null);
+                }
+            }
+
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            const { data: publicData, error: publicError } = await supabase
+                .from("user_cryptids")
+                .select("id, user_id, name, location, latitude, longitude, description, category, created_at, is_public")
+                .eq("is_public", true)
+                .order("created_at", { ascending: false });
+
+            if (publicError) {
+                console.error("Failed to load public cryptids:", publicError.message);
+                setPublicCreatures([]);
+                setFeedbackMessage(mapSupabaseError(publicError.message, "load"));
+                setIsLoadingUserCreatures(false);
+                return;
+            }
+
+            const mappedPublic = (publicData as UserCryptidRow[]).map((row) => ({
+                id: row.id,
+                ownerId: row.user_id,
+                name: row.name,
+                location: row.location,
+                coords: [Number(row.latitude), Number(row.longitude)] as [number, number],
+                description: row.description,
+                category: row.category,
+                source: "user" as const,
+                createdAt: row.created_at,
+                visibility: row.is_public ? "public" as const : "private" as const,
+            }));
+
+            if (!session?.user || guestMode) {
+                setCurrentUserId(null);
+                setUserCreatures([]);
+                if (guestMode) {
+                    try {
+                        const saved = localStorage.getItem("userCreatures");
+                        const parsed = saved ? (JSON.parse(saved) as Creature[]) : [];
+                        setUserCreatures(parsed.map(normalizeLocalCreature));
+                    } catch {
+                        setUserCreatures([]);
+                    }
+                }
+                setPublicCreatures(mappedPublic);
+                setIsLoadingUserCreatures(false);
+                return;
+            }
+
+            setCurrentUserId(session.user.id);
+
+            const { data: ownData, error: ownError } = await supabase
+                .from("user_cryptids")
+                .select("id, user_id, name, location, latitude, longitude, description, category, created_at, is_public")
+                .eq("user_id", session.user.id)
+                .order("created_at", { ascending: false });
+
+            if (ownError) {
+                console.error("Failed to load own cryptids:", ownError.message);
+                setUserCreatures([]);
+                setPublicCreatures(mappedPublic.filter((entry) => entry.ownerId !== session.user.id));
+                setFeedbackMessage(mapSupabaseError(ownError.message, "load"));
+                setIsLoadingUserCreatures(false);
+                return;
+            }
+
+            const mappedOwn = (ownData as UserCryptidRow[]).map((row) => ({
+                id: row.id,
+                ownerId: row.user_id,
+                name: row.name,
+                location: row.location,
+                coords: [Number(row.latitude), Number(row.longitude)] as [number, number],
+                description: row.description,
+                category: row.category,
+                source: "user" as const,
+                createdAt: row.created_at,
+                visibility: row.is_public ? "public" as const : "private" as const,
+            }));
+
+            setUserCreatures(mappedOwn);
+            setPublicCreatures(mappedPublic.filter((entry) => entry.ownerId !== session.user.id));
+            setIsLoadingUserCreatures(false);
+        };
+
+        loadUserCreatures();
+
+        if (!supabase) {
+            return;
+        }
+
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange(() => {
+            setIsLoadingUserCreatures(true);
+            loadUserCreatures();
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, [refreshToken]);
 
     // 🟢 GraphQL query — fetch all creatures
     const { data, loading, error } = useQuery<{ creatures: Creature[] }>(GET_CREATURES);
     const allCreatures: Creature[] = data?.creatures ?? [];
 
+    const searchableCreatures = [...allCreatures, ...publicCreatures, ...userCreatures];
+
     // Marker refs
     const markerRefs = useRef<Record<string, React.RefObject<L.Marker | null>>>({});
-    allCreatures.forEach((c) => {
-        if (!markerRefs.current[c.name]) {
-            markerRefs.current[c.name] = React.createRef<L.Marker | null>();
+    searchableCreatures.forEach((c) => {
+        const key = c.id ?? c.name;
+        if (!markerRefs.current[key]) {
+            markerRefs.current[key] = React.createRef<L.Marker | null>();
         }
     });
 
@@ -291,15 +469,23 @@ export default function CryptidsMap() {
         filter === "All"
             ? allCreatures
             : allCreatures.filter((c) => c.category === filter);
+    const filteredPublicCreatures =
+        filter === "All"
+            ? publicCreatures
+            : publicCreatures.filter((c) => c.category === filter);
+    const filteredUserCreatures =
+        filter === "All"
+            ? userCreatures
+            : userCreatures.filter((c) => c.category === filter);
 
     // Search handler
     const handleSearch = (query: string) => {
-        const match = allCreatures.find(
+        const match = searchableCreatures.find(
             (c) => c.name.toLowerCase() === query.toLowerCase()
         );
         if (match) {
             setFlyCoords(match.coords as LatLngExpression);
-            setActiveMarker(markerRefs.current[match.name]);
+            setActiveMarker(markerRefs.current[match.id ?? match.name]);
         } else {
             alert("Creature not found.");
         }
@@ -331,16 +517,256 @@ export default function CryptidsMap() {
 
     const handleSelectFromList = (creature: Creature) => {
         setFlyCoords(creature.coords as LatLngExpression);
-        setActiveMarker(markerRefs.current[creature.name] ?? null);
+        setActiveMarker(markerRefs.current[creature.id ?? creature.name] ?? null);
         setDrawerCreature(creature);
     };
 
-    const handleAddCreature = (creature: Creature) => {
-        setUserCreatures((prev) => {
-            const updated = [...prev, creature];
-            localStorage.setItem("userCreatures", JSON.stringify(updated));
-            return updated;
+    const persistLocalCreatures = (nextCreatures: Creature[]) => {
+        localStorage.setItem("userCreatures", JSON.stringify(nextCreatures));
+        setUserCreatures(nextCreatures);
+    };
+
+    const storageLabel = isGuest
+        ? "Saved locally in this browser as a guest entry."
+        : "Saved to your signed-in account.";
+
+    const validateCreature = (creature: Creature) => {
+        const normalizedName = creature.name.trim().toLowerCase();
+        const normalizedLocation = creature.location.trim() || "Unknown";
+        const normalizedDescription = creature.description.trim();
+
+        if (!normalizedName) {
+            throw new Error("Name is required.");
+        }
+
+        if (creature.name.trim().length > MAX_NAME_LENGTH) {
+            throw new Error(`Name must be ${MAX_NAME_LENGTH} characters or fewer.`);
+        }
+
+        if (normalizedDescription.length > MAX_DESCRIPTION_LENGTH) {
+            throw new Error(`Description must be ${MAX_DESCRIPTION_LENGTH} characters or fewer.`);
+        }
+
+        if (!ALLOWED_CATEGORIES.has(creature.category)) {
+            throw new Error("Please choose a valid category.");
+        }
+
+        const duplicateUserEntry = userCreatures.find((entry) => {
+            if (editingCreature?.id && entry.id === editingCreature.id) {
+                return false;
+            }
+
+            return entry.name.trim().toLowerCase() === normalizedName;
         });
+
+        const duplicateDatabaseEntry = [...allCreatures, ...publicCreatures].find(
+            (entry) => entry.name.trim().toLowerCase() === normalizedName
+        );
+
+        if (duplicateUserEntry || duplicateDatabaseEntry) {
+            throw new Error("You already added a cryptid with this exact name.");
+        }
+
+        return {
+            ...creature,
+            name: creature.name.trim(),
+            location: normalizedLocation,
+            description: normalizedDescription,
+            visibility: creature.visibility ?? "private",
+        };
+    };
+
+    const mapSupabaseError = (message: string, action: "load" | "save" | "update" | "delete") => {
+        const loweredMessage = message.toLowerCase();
+
+        if (loweredMessage.includes("row-level security") || loweredMessage.includes("permission denied")) {
+            return `Permission denied. Your account is not allowed to ${action} this cryptid yet. Check the RLS policies on public.user_cryptids.`;
+        }
+
+        if (loweredMessage.includes("jwt") || loweredMessage.includes("not authenticated") || loweredMessage.includes("auth session missing")) {
+            return "Your session is no longer active. Please log in again and try once more.";
+        }
+
+        return message;
+    };
+
+    const handleSaveCreature = async (creature: Creature) => {
+        const guestMode = localStorage.getItem("cryptidsGuestMode") === "true";
+        const validatedCreature = validateCreature(creature);
+        const normalizedCreature = {
+            ...validatedCreature,
+            id: validatedCreature.id ?? editingCreature?.id,
+            source: "user" as const,
+            visibility: guestMode ? "private" as const : validatedCreature.visibility ?? "private" as const,
+        };
+
+        if (!supabase || guestMode) {
+            if (editingCreature?.id) {
+                const updated = userCreatures.map((entry) =>
+                    entry.id === editingCreature.id
+                        ? { ...normalizedCreature, id: editingCreature.id, source: "user" as const }
+                        : entry
+                );
+                persistLocalCreatures(updated);
+                setDrawerCreature({ ...normalizedCreature, id: editingCreature.id, source: "user" });
+                setEditingCreature(null);
+                setFeedbackMessage("Entry updated in your local field guide.");
+                return;
+            }
+
+            const newCreature = normalizeLocalCreature(normalizedCreature);
+            const updated = [newCreature, ...userCreatures];
+            persistLocalCreatures(updated);
+            setDrawerCreature(newCreature);
+            setFeedbackMessage("Creature saved to your local field guide.");
+            return;
+        }
+
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.user) {
+            throw new Error("You are not logged in. Please log in again before saving.");
+        }
+
+        if (editingCreature?.id) {
+            const { error } = await supabase
+                .from("user_cryptids")
+                .update({
+                    name: normalizedCreature.name,
+                    location: normalizedCreature.location,
+                    latitude: normalizedCreature.coords[0],
+                    longitude: normalizedCreature.coords[1],
+                    description: normalizedCreature.description,
+                    category: normalizedCreature.category,
+                    is_public: normalizedCreature.visibility === "public",
+                })
+                .eq("id", editingCreature.id)
+                .eq("user_id", session.user.id);
+
+            if (error) {
+                throw new Error(mapSupabaseError(error.message, "update"));
+            }
+
+            const updatedCreature = {
+                ...normalizedCreature,
+                id: editingCreature.id,
+                source: "user" as const,
+            };
+            setUserCreatures((prev) =>
+                prev.map((entry) => (entry.id === editingCreature.id ? updatedCreature : entry))
+            );
+            setDrawerCreature(updatedCreature);
+            setEditingCreature(null);
+            setFeedbackMessage("Creature updated in your field guide.");
+            return;
+        }
+
+        const { data: insertedRow, error } = await supabase
+            .from("user_cryptids")
+            .insert({
+                user_id: session.user.id,
+                name: normalizedCreature.name,
+                location: normalizedCreature.location,
+                latitude: normalizedCreature.coords[0],
+                longitude: normalizedCreature.coords[1],
+                description: normalizedCreature.description,
+                category: normalizedCreature.category,
+                is_public: normalizedCreature.visibility === "public",
+            })
+            .select("id, created_at, user_id, is_public")
+            .single();
+
+        if (error) {
+            throw new Error(mapSupabaseError(error.message, "save"));
+        }
+
+        const savedCreature: Creature = {
+            ...normalizedCreature,
+            id: insertedRow.id,
+            source: "user",
+            createdAt: insertedRow.created_at,
+            ownerId: insertedRow.user_id,
+            visibility: insertedRow.is_public ? "public" : "private",
+        };
+
+        setUserCreatures((prev) => [savedCreature, ...prev]);
+        setDrawerCreature(savedCreature);
+        setFeedbackMessage("Creature saved to your field guide.");
+    };
+
+    const handleEditCreature = (creature: Creature) => {
+        setDrawerCreature(null);
+        setPickedCoords(creature.coords);
+        setEditingCreature(creature);
+        setShowAddModal(true);
+    };
+
+    const handleDeleteCreature = (creature: Creature) => {
+        if (!creature.id) {
+            return;
+        }
+
+        setPendingDeleteCreature(creature);
+    };
+
+    const confirmDeleteCreature = async () => {
+        const creature = pendingDeleteCreature;
+        if (!creature?.id) {
+            setPendingDeleteCreature(null);
+            return;
+        }
+
+        const guestMode = localStorage.getItem("cryptidsGuestMode") === "true";
+
+        if (!supabase || guestMode) {
+            const updated = userCreatures.filter((entry) => entry.id !== creature.id);
+            persistLocalCreatures(updated);
+            if (drawerCreature?.id === creature.id) {
+                setDrawerCreature(null);
+            }
+            if (editingCreature?.id === creature.id) {
+                setEditingCreature(null);
+                setShowAddModal(false);
+            }
+            setFeedbackMessage("Creature removed from your local field guide.");
+            setPendingDeleteCreature(null);
+            return;
+        }
+
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.user) {
+            alert("You are not logged in. Please log in again before deleting.");
+            setPendingDeleteCreature(null);
+            return;
+        }
+
+        const { error } = await supabase
+            .from("user_cryptids")
+            .delete()
+            .eq("id", creature.id)
+            .eq("user_id", session.user.id);
+
+        if (error) {
+            alert(mapSupabaseError(error.message, "delete"));
+            setPendingDeleteCreature(null);
+            return;
+        }
+
+        setUserCreatures((prev) => prev.filter((entry) => entry.id !== creature.id));
+        if (drawerCreature?.id === creature.id) {
+            setDrawerCreature(null);
+        }
+        if (editingCreature?.id === creature.id) {
+            setEditingCreature(null);
+            setShowAddModal(false);
+        }
+        setFeedbackMessage("Creature removed from your field guide.");
+        setPendingDeleteCreature(null);
     };
 
     const handlePickStart = () => {
@@ -354,7 +780,7 @@ export default function CryptidsMap() {
         setShowAddModal(true);
     };
 
-    if (loading) return <div style={{ padding: 40, color: "#fff", background: "#111", height: "100vh" }}>Loading creatures...</div>;
+    if (loading || isLoadingUserCreatures) return <div style={{ padding: 40, color: "#fff", background: "#111", height: "100vh" }}>Loading creatures...</div>;
     if (error) return <div style={{ padding: 40, color: "red" }}>Error: {error.message}</div>;
 
     return (
@@ -384,7 +810,7 @@ export default function CryptidsMap() {
                                 key={c.name}
                                 position={c.coords as LatLngExpression}
                                 icon={createIcon(color)}
-                                ref={markerRefs.current[c.name]}
+                                ref={markerRefs.current[c.id ?? c.name]}
                                 eventHandlers={{
                                     click: () => setDrawerCreature(c),
                                 }}
@@ -407,13 +833,28 @@ export default function CryptidsMap() {
 
                 {/* User-added creature markers */}
                 <MarkerClusterGroup chunkedLoading>
-                    {userCreatures.map((c, i) => {
+                    {filteredPublicCreatures.map((c, i) => {
                         const color = categoryColors[c.category] || "grey";
                         return (
                             <Marker
-                                key={`user-${i}-${c.name}`}
+                                key={c.id ?? `public-${i}-${c.name}`}
                                 position={c.coords as LatLngExpression}
                                 icon={createIcon(color)}
+                                ref={markerRefs.current[c.id ?? c.name]}
+                                eventHandlers={{ click: () => setDrawerCreature(c) }}
+                            >
+                                <Popup><b>{c.name}</b><br />{c.location}</Popup>
+                            </Marker>
+                        );
+                    })}
+                    {filteredUserCreatures.map((c, i) => {
+                        const color = categoryColors[c.category] || "grey";
+                        return (
+                            <Marker
+                                key={c.id ?? `user-${i}-${c.name}`}
+                                position={c.coords as LatLngExpression}
+                                icon={createIcon(color)}
+                                ref={markerRefs.current[c.id ?? c.name]}
                                 eventHandlers={{ click: () => setDrawerCreature(c) }}
                             >
                                 <Popup><b>{c.name}</b><br />{c.location}</Popup>
@@ -439,12 +880,15 @@ export default function CryptidsMap() {
                 selected={filter}
                 setSelected={setFilter}
                 onSearch={handleSearch}
-                allCreatures={allCreatures}
+                allCreatures={searchableCreatures}
             />
             <Legend />
             <CreatureDrawer
                 creature={drawerCreature}
                 onClose={() => setDrawerCreature(null)}
+                onEdit={handleEditCreature}
+                onDelete={handleDeleteCreature}
+                currentUserId={currentUserId}
             />
             {/* Bottom-right action buttons */}
             <div className="map-actions header-panel">
@@ -455,7 +899,11 @@ export default function CryptidsMap() {
                     All Cryptids
                 </button>
                 <button
-                    onClick={() => { setPickedCoords(null); setShowAddModal(true); }}
+                    onClick={() => {
+                        setPickedCoords(null);
+                        setEditingCreature(null);
+                        setShowAddModal(true);
+                    }}
                     title="Add a new creature"
                     className="map-actions-add"
                 >
@@ -467,6 +915,7 @@ export default function CryptidsMap() {
             <CryptidListPanel
                 isOpen={showListPanel}
                 allCreatures={allCreatures}
+                publicCreatures={publicCreatures}
                 userCreatures={userCreatures}
                 onSelect={handleSelectFromList}
                 onClose={() => setShowListPanel(false)}
@@ -475,12 +924,76 @@ export default function CryptidsMap() {
             {/* Add creature modal */}
             {showAddModal && (
                 <AddCreatureModal
-                    onAdd={handleAddCreature}
-                    onClose={() => { setShowAddModal(false); setIsPicking(false); }}
+                    onSave={handleSaveCreature}
+                    onClose={() => {
+                        setShowAddModal(false);
+                        setIsPicking(false);
+                        setEditingCreature(null);
+                    }}
                     pickedCoords={pickedCoords}
                     onStartPicking={handlePickStart}
                     isPicking={isPicking}
+                    initialCreature={editingCreature}
+                    storageLabel={storageLabel}
+                    allowVisibilityChoice={!isGuest}
                 />
+            )}
+
+            {feedbackMessage && (
+                <div className="map-feedback-toast header-panel" role="status" aria-live="polite">
+                    {feedbackMessage}
+                </div>
+            )}
+
+            {pendingDeleteCreature && (
+                <>
+                    <div
+                        className="modal-scrim is-open"
+                        onClick={() => setPendingDeleteCreature(null)}
+                    />
+                    <div className="confirm-modal" role="dialog" aria-modal="true" aria-label="Delete creature entry">
+                        <div className="modal-header">
+                            <div>
+                                <p className="side-panel-eyebrow">Field Guide</p>
+                                <h2 className="side-panel-title">Delete Entry?</h2>
+                                <p className="modal-subtitle">
+                                    Remove <strong>{pendingDeleteCreature.name}</strong> from your field guide.
+                                </p>
+                                <p className="modal-storage-note">{storageLabel}</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setPendingDeleteCreature(null)}
+                                className="side-panel-close"
+                                aria-label="Close delete confirmation"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="confirm-modal-copy">
+                            This action cannot be undone. You can always add the creature again later,
+                            but this specific saved entry will be removed.
+                        </div>
+
+                        <div className="confirm-modal-actions">
+                            <button
+                                type="button"
+                                className="detail-drawer-button"
+                                onClick={() => setPendingDeleteCreature(null)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="detail-drawer-button detail-drawer-button-danger"
+                                onClick={confirmDeleteCreature}
+                            >
+                                Delete Entry
+                            </button>
+                        </div>
+                    </div>
+                </>
             )}
         </div>
     );

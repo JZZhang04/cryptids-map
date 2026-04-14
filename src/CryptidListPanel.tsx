@@ -10,6 +10,7 @@ const categoryColors: Record<string, string> = {
 interface Props {
     isOpen: boolean;
     allCreatures: Creature[];
+    publicCreatures: Creature[];
     userCreatures: Creature[];
     onSelect: (creature: Creature) => void;
     onClose: () => void;
@@ -18,6 +19,7 @@ interface Props {
 export default function CryptidListPanel({
     isOpen,
     allCreatures,
+    publicCreatures,
     userCreatures,
     onSelect,
     onClose,
@@ -35,7 +37,7 @@ export default function CryptidListPanel({
                         <p className="side-panel-eyebrow">Field Guide Archive</p>
                         <h2 className="side-panel-title">All Cryptids</h2>
                         <p className="list-panel-count">
-                            {allCreatures.length + userCreatures.length} creatures total
+                            {allCreatures.length + publicCreatures.length + userCreatures.length} creatures total
                         </p>
                     </div>
                     <button onClick={onClose} className="side-panel-close" aria-label="Close list panel">
@@ -49,18 +51,43 @@ export default function CryptidListPanel({
                         <CreatureRow key={c.name} creature={c} onClick={() => { onSelect(c); onClose(); }} />
                     ))}
 
-                    {userCreatures.length > 0 && (
-                        <>
-                            <SectionLabel label="Added by You" count={userCreatures.length} />
-                            {userCreatures.map((c, i) => (
-                                <CreatureRow
-                                    key={`user-${i}-${c.name}`}
-                                    creature={c}
-                                    userAdded
-                                    onClick={() => { onSelect(c); onClose(); }}
-                                />
-                            ))}
-                        </>
+                    <SectionLabel label="Community Sightings" count={publicCreatures.length} />
+                    {publicCreatures.length > 0 ? (
+                        publicCreatures.map((c, i) => (
+                            <CreatureRow
+                                key={c.id ?? `public-${i}-${c.name}`}
+                                creature={c}
+                                visibilityBadge="Public"
+                                onClick={() => { onSelect(c); onClose(); }}
+                            />
+                        ))
+                    ) : (
+                        <div className="list-empty-state">
+                            <p className="list-empty-title">No public community entries yet</p>
+                            <p className="list-empty-copy">
+                                Public sightings shared by explorers will appear here for everyone to browse.
+                            </p>
+                        </div>
+                    )}
+
+                    <SectionLabel label="Added by You" count={userCreatures.length} />
+                    {userCreatures.length > 0 ? (
+                        userCreatures.map((c, i) => (
+                            <CreatureRow
+                                key={c.id ?? `user-${i}-${c.name}`}
+                                creature={c}
+                                userAdded
+                                visibilityBadge={c.visibility === "public" ? "Public" : "Private"}
+                                onClick={() => { onSelect(c); onClose(); }}
+                            />
+                        ))
+                    ) : (
+                        <div className="list-empty-state">
+                            <p className="list-empty-title">No personal entries yet</p>
+                            <p className="list-empty-copy">
+                                Add your first creature to start building a personal field guide.
+                            </p>
+                        </div>
                     )}
                 </div>
             </div>
@@ -80,10 +107,12 @@ function SectionLabel({ label, count }: { label: string; count: number }) {
 function CreatureRow({
     creature,
     userAdded = false,
+    visibilityBadge,
     onClick,
 }: {
     creature: Creature;
     userAdded?: boolean;
+    visibilityBadge?: string;
     onClick: () => void;
 }) {
     return (
@@ -105,6 +134,7 @@ function CreatureRow({
                 <div className="list-creature-name">
                     {creature.name}
                     {userAdded && <span className="list-creature-badge">You</span>}
+                    {visibilityBadge && <span className="list-creature-badge list-creature-badge-secondary">{visibilityBadge}</span>}
                 </div>
                 <div className="list-creature-location">{creature.location}</div>
             </div>

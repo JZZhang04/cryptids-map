@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.1.6",
+    "@supabase/supabase-js": "^2.103.0",
     "graphql": "^16.13.2",
     "leaflet": "^1.9.4",
     "react": "^19.1.1",
