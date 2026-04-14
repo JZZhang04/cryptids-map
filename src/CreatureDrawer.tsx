@@ -21,7 +21,17 @@ export default function CreatureDrawer({ creature, onClose, onEdit, onDelete, cu
     creature?.source === "user" &&
     (!creature.ownerId || (currentUserId !== null && creature.ownerId === currentUserId));
   const visibilityLabel =
-    creature?.visibility === "public" ? "Public Entry" : creature?.source === "user" ? "Private Entry" : null;
+    creature?.visibility === "public" ? "Public Submission" : creature?.source === "user" ? "Private Entry" : null;
+  const reviewStatusLabel =
+    creature?.reviewStatus === "pending_review"
+      ? "Pending Review"
+      : creature?.reviewStatus === "approved"
+        ? "Approved"
+        : creature?.reviewStatus === "rejected"
+          ? "Rejected"
+          : creature?.source === "user"
+            ? "Draft"
+            : null;
 
   return (
     <>
@@ -58,6 +68,7 @@ export default function CreatureDrawer({ creature, onClose, onEdit, onDelete, cu
                 </span>
                 {isOwnEntry && <span className="detail-drawer-origin">Your Entry</span>}
                 {visibilityLabel && <span className="detail-drawer-origin detail-drawer-origin-secondary">{visibilityLabel}</span>}
+                {reviewStatusLabel && <span className="detail-drawer-origin detail-drawer-origin-secondary">{reviewStatusLabel}</span>}
               </div>
             </div>
 
@@ -77,6 +88,13 @@ export default function CreatureDrawer({ creature, onClose, onEdit, onDelete, cu
               <p className="detail-drawer-label">Description</p>
               <p className="detail-drawer-description">{creature.description}</p>
             </section>
+
+            {creature.reviewNotes && (
+              <section className="detail-drawer-section">
+                <p className="detail-drawer-label">Moderator Notes</p>
+                <p className="detail-drawer-description">{creature.reviewNotes}</p>
+              </section>
+            )}
 
             {isOwnEntry && (
               <section className="detail-drawer-section detail-drawer-actions">

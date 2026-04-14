@@ -9,6 +9,9 @@ export type Creature = {
   createdAt?: string;
   visibility?: "private" | "public";
   ownerId?: string;
+  reviewStatus?: "draft" | "pending_review" | "approved" | "rejected";
+  reviewNotes?: string;
+  reviewedAt?: string;
 };
 
 export type UserCryptidRow = {
@@ -21,5 +24,10 @@ export type UserCryptidRow = {
   description: string;
   category: string;
   created_at: string;
-  is_public: boolean;
+  visibility: "private" | "public";
+  review_status: "draft" | "pending_review" | "approved" | "rejected";
+  review_notes: string | null;
+  reviewed_at?: string | null;
 };
+
+export type ProfileRole = "user" | "moderator" | "admin";

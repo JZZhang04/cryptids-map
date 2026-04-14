@@ -3,7 +3,8 @@ import type { FormEvent } from "react";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import CryptidsMap from "./CryptidsMap";
 import { isSupabaseConfigured, supabase } from "./supabase";
-import type { Creature } from "./types";
+import type { Creature, ProfileRole, UserCryptidRow } from "./types";
+import reviewSuccessImage from "../docs/review_success.png";
 import "./App.css";
 
 type AuthMode = "login" | "signup";
@@ -20,9 +21,11 @@ type PendingMigrationEntry = {
   status: MigrationStatus;
   reason: string;
 };
+type ModeratorQueueItem = Creature;
 
 const GUEST_STORAGE_KEY = "cryptidsGuestMode";
 const USER_CREATURES_STORAGE_KEY = "userCreatures";
+const REVIEW_NOTICE_STORAGE_PREFIX = "reviewApprovedNoticeSeen";
 
 function readLocalGuestCreatures() {
   try {
@@ -120,6 +123,42 @@ function getDisplayName(session: Session | null) {
   return "Explorer";
 }
 
+async function getUserRole(session: Session | null): Promise<ProfileRole> {
+  if (!session?.user || !supabase) {
+    return "user";
+  }
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", session.user.id)
+    .single();
+
+  if (error || !data?.role) {
+    return "user";
+  }
+
+  return data.role as ProfileRole;
+}
+
+function mapReviewRow(row: UserCryptidRow): ModeratorQueueItem {
+  return {
+    id: row.id,
+    ownerId: row.user_id,
+    name: row.name,
+    location: row.location,
+    coords: [Number(row.latitude), Number(row.longitude)],
+    description: row.description,
+    category: row.category,
+    source: "user",
+    createdAt: row.created_at,
+    visibility: row.visibility,
+    reviewStatus: row.review_status,
+    reviewNotes: row.review_notes ?? undefined,
+    reviewedAt: row.reviewed_at ?? undefined,
+  };
+}
+
 function App() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
@@ -138,15 +177,31 @@ function App() {
   const [mapRefreshToken, setMapRefreshToken] = useState(0);
   const [pendingMigrationEntries, setPendingMigrationEntries] = useState<PendingMigrationEntry[]>([]);
   const [existingAccountNames, setExistingAccountNames] = useState<string[]>([]);
+  const [userRole, setUserRole] = useState<ProfileRole>("user");
+  const [showModeratorPanel, setShowModeratorPanel] = useState(false);
+  const [moderatorQueue, setModeratorQueue] = useState<ModeratorQueueItem[]>([]);
+  const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
+  const [reviewNotesDraft, setReviewNotesDraft] = useState("");
+  const [isLoadingModeratorQueue, setIsLoadingModeratorQueue] = useState(false);
+  const [isSubmittingReviewAction, setIsSubmittingReviewAction] = useState(false);
+  const [moderatorMessage, setModeratorMessage] = useState("");
+  const [approvedNoticeQueue, setApprovedNoticeQueue] = useState<Creature[]>([]);
 
   const selectedMigrationCount = pendingMigrationEntries.filter((entry) => entry.selected).length;
   const readyMigrationCount = pendingMigrationEntries.filter((entry) => entry.status === "ready").length;
+  const selectedReviewItem =
+    moderatorQueue.find((item) => item.id === selectedReviewId) ?? moderatorQueue[0] ?? null;
   const skippedSelectedEntries = pendingMigrationEntries.filter(
     (entry) =>
       entry.selected &&
       entry.status !== "ready" &&
       entry.status !== "unselected"
   );
+  const currentApprovedNotice = approvedNoticeQueue[0] ?? null;
+
+  useEffect(() => {
+    setReviewNotesDraft(selectedReviewItem?.reviewNotes ?? "");
+  }, [selectedReviewItem?.id]);
 
   const refreshMigrationState = async (activeSession: Session | null) => {
     const localCreatures = readLocalGuestCreatures();
@@ -191,6 +246,89 @@ function App() {
     setGuestEntriesPendingMigration(localCreatures.length);
   };
 
+  const refreshModeratorQueue = async (activeSession: Session | null, activeRole: ProfileRole) => {
+    if (!supabase || !activeSession?.user || !["moderator", "admin"].includes(activeRole)) {
+      setModeratorQueue([]);
+      setSelectedReviewId(null);
+      return;
+    }
+
+    setIsLoadingModeratorQueue(true);
+    const { data, error } = await supabase
+      .from("user_cryptids")
+      .select("id, user_id, name, location, latitude, longitude, description, category, created_at, visibility, review_status, review_notes")
+      .eq("review_status", "pending_review")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      setModeratorMessage(`Unable to load review queue. ${error.message}`);
+      setModeratorQueue([]);
+      setSelectedReviewId(null);
+      setIsLoadingModeratorQueue(false);
+      return;
+    }
+
+    const mappedQueue = ((data ?? []) as UserCryptidRow[]).map(mapReviewRow);
+    setModeratorQueue(mappedQueue);
+    setSelectedReviewId((current) =>
+      mappedQueue.some((item) => item.id === current) ? current : mappedQueue[0]?.id ?? null
+    );
+    setIsLoadingModeratorQueue(false);
+  };
+
+  const refreshApprovedNotices = async (activeSession: Session | null) => {
+    if (!supabase || !activeSession?.user) {
+      setApprovedNoticeQueue([]);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("user_cryptids")
+      .select("id, user_id, name, location, latitude, longitude, description, category, created_at, visibility, review_status, review_notes, reviewed_at")
+      .eq("user_id", activeSession.user.id)
+      .eq("visibility", "public")
+      .eq("review_status", "approved")
+      .not("reviewed_at", "is", null)
+      .order("reviewed_at", { ascending: false });
+
+    if (error) {
+      return;
+    }
+
+    const storageKey = `${REVIEW_NOTICE_STORAGE_PREFIX}:${activeSession.user.id}`;
+    let seenIds: string[] = [];
+
+    try {
+      const saved = localStorage.getItem(storageKey);
+      seenIds = saved ? (JSON.parse(saved) as string[]) : [];
+    } catch {
+      seenIds = [];
+    }
+
+    const unseenApproved = ((data ?? []) as UserCryptidRow[])
+      .map(mapReviewRow)
+      .filter((entry) => entry.id && !seenIds.includes(entry.id));
+
+    setApprovedNoticeQueue(unseenApproved);
+  };
+
+  const dismissApprovedNotice = (creatureId?: string) => {
+    if (session?.user && creatureId) {
+      const storageKey = `${REVIEW_NOTICE_STORAGE_PREFIX}:${session.user.id}`;
+      try {
+        const saved = localStorage.getItem(storageKey);
+        const seenIds = saved ? (JSON.parse(saved) as string[]) : [];
+        if (!seenIds.includes(creatureId)) {
+          localStorage.setItem(storageKey, JSON.stringify([...seenIds, creatureId]));
+        }
+      } catch {
+        localStorage.setItem(storageKey, JSON.stringify([creatureId]));
+      }
+    }
+
+    setApprovedNoticeQueue((prev) => prev.filter((entry) => entry.id !== creatureId));
+  };
+
   const portalTitle = useMemo(
     () => (mode === "login" ? "Log in to explore the map" : "Create an explorer account"),
     [mode]
@@ -218,22 +356,34 @@ function App() {
 
       if (session) {
         localStorage.removeItem(GUEST_STORAGE_KEY);
+        const role = await getUserRole(session);
         setSession(session);
+        setUserRole(role);
         setIsGuest(false);
         setIsAuthenticated(true);
         setDisplayName(getDisplayName(session));
         await refreshMigrationState(session);
+        await refreshModeratorQueue(session, role);
+        await refreshApprovedNotices(session);
       } else if (guestMode) {
         setSession(null);
+        setUserRole("user");
         setIsGuest(true);
         setIsAuthenticated(true);
         setDisplayName("Guest");
         setGuestEntriesPendingMigration(0);
         setPendingMigrationEntries([]);
+        setModeratorQueue([]);
+        setSelectedReviewId(null);
+        setApprovedNoticeQueue([]);
       } else {
         setSession(null);
+        setUserRole("user");
         setGuestEntriesPendingMigration(0);
         setPendingMigrationEntries([]);
+        setModeratorQueue([]);
+        setSelectedReviewId(null);
+        setApprovedNoticeQueue([]);
       }
 
       setIsLoadingAuth(false);
@@ -251,16 +401,23 @@ function App() {
       (_event: AuthChangeEvent, session: Session | null) => {
         if (session) {
           localStorage.removeItem(GUEST_STORAGE_KEY);
-          setSession(session);
-          setIsGuest(false);
-          setIsAuthenticated(true);
-          setDisplayName(getDisplayName(session));
-          setAuthMessage("");
-          setDismissedMigrationPrompt(false);
-          void refreshMigrationState(session);
+          void (async () => {
+            const role = await getUserRole(session);
+            setSession(session);
+            setUserRole(role);
+            setIsGuest(false);
+            setIsAuthenticated(true);
+            setDisplayName(getDisplayName(session));
+            setAuthMessage("");
+            setDismissedMigrationPrompt(false);
+            await refreshMigrationState(session);
+            await refreshModeratorQueue(session, role);
+            await refreshApprovedNotices(session);
+          })();
         } else {
           const guestMode = localStorage.getItem(GUEST_STORAGE_KEY) === "true";
           setSession(null);
+          setUserRole("user");
           setIsGuest(guestMode);
           setIsAuthenticated(guestMode);
           setDisplayName(guestMode ? "Guest" : "");
@@ -269,6 +426,11 @@ function App() {
           setExistingAccountNames([]);
           setDismissedMigrationPrompt(false);
           setMigrationMessage("");
+          setModeratorQueue([]);
+          setSelectedReviewId(null);
+          setShowModeratorPanel(false);
+          setModeratorMessage("");
+          setApprovedNoticeQueue([]);
         }
       }
     );
@@ -343,15 +505,21 @@ function App() {
     setPassword("");
     setMigrationMessage("");
     setDismissedMigrationPrompt(false);
+    setModeratorMessage("");
+    setShowModeratorPanel(false);
 
     if (isGuest || !supabase) {
       setIsGuest(false);
       setIsAuthenticated(false);
       setDisplayName("");
       setSession(null);
+      setUserRole("user");
       setGuestEntriesPendingMigration(0);
       setPendingMigrationEntries([]);
       setExistingAccountNames([]);
+      setModeratorQueue([]);
+      setSelectedReviewId(null);
+      setApprovedNoticeQueue([]);
       return;
     }
 
@@ -398,7 +566,8 @@ function App() {
         longitude: entry.creature.coords[1],
         description: entry.creature.description?.trim() || "",
         category: entry.creature.category,
-        is_public: false,
+        visibility: "private",
+        review_status: "draft",
       }));
     const skippedEntries = pendingMigrationEntries.filter(
       (entry) => entry.selected && entry.status !== "ready"
@@ -439,6 +608,42 @@ function App() {
     );
   };
 
+  const handleModeratorAction = async (nextStatus: "approved" | "rejected") => {
+    if (!supabase || !session?.user || !selectedReviewItem?.id) {
+      setModeratorMessage("Sign in as a moderator again before reviewing.");
+      return;
+    }
+
+    setIsSubmittingReviewAction(true);
+    setModeratorMessage("");
+
+    const { error } = await supabase
+      .from("user_cryptids")
+      .update({
+        review_status: nextStatus,
+        review_notes: reviewNotesDraft.trim() || null,
+        reviewed_by: session.user.id,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", selectedReviewItem.id);
+
+    if (error) {
+      setIsSubmittingReviewAction(false);
+      setModeratorMessage(`Review update failed. ${error.message}`);
+      return;
+    }
+
+    setModeratorMessage(
+      nextStatus === "approved"
+        ? `"${selectedReviewItem.name}" approved and published to the public map.`
+        : `"${selectedReviewItem.name}" was rejected and returned to the submitter.`
+    );
+    setReviewNotesDraft("");
+    setMapRefreshToken((prev) => prev + 1);
+    await refreshModeratorQueue(session, userRole);
+    setIsSubmittingReviewAction(false);
+  };
+
   if (isLoadingAuth) {
     return (
       <div className="app-shell">
@@ -457,6 +662,45 @@ function App() {
       <CryptidsMap isGuest={isGuest} refreshToken={mapRefreshToken} />
 
       {!isAuthenticated && <div className="app-overlay" aria-hidden="true" />}
+
+      {currentApprovedNotice && (
+        <>
+          <div className="app-overlay review-success-overlay" aria-hidden="true" />
+          <section className="review-success-card header-panel" role="dialog" aria-modal="true" aria-label="Review approved notice">
+            <button
+              type="button"
+              className="side-panel-close review-success-close"
+              onClick={() => dismissApprovedNotice(currentApprovedNotice.id)}
+              aria-label="Close approval notice"
+            >
+              ✕
+            </button>
+            <img
+              src={reviewSuccessImage}
+              alt="Approved submission illustration"
+              className="review-success-image"
+            />
+            <p className="portal-eyebrow">Field Guide Update</p>
+            <h2>Your sighting is now public</h2>
+            <p className="review-success-copy">
+              <strong>{currentApprovedNotice.name}</strong> passed moderator review and is now visible
+              to everyone exploring the map.
+            </p>
+            {currentApprovedNotice.reviewNotes && (
+              <p className="review-success-notes">
+                Moderator note: {currentApprovedNotice.reviewNotes}
+              </p>
+            )}
+            <button
+              type="button"
+              className="guide-confirm"
+              onClick={() => dismissApprovedNotice(currentApprovedNotice.id)}
+            >
+              Celebrate and continue
+            </button>
+          </section>
+        </>
+      )}
 
       {!isAuthenticated && (
         <section className="portal-card" aria-label="Cryptids portal">
@@ -536,10 +780,22 @@ function App() {
       {isAuthenticated && (
         <div className="session-bar header-panel">
           <div className="session-copy">
-            <span className="session-label">{isGuest ? "Guest" : "Explorer"}</span>
+            <span className="session-label">{isGuest ? "Guest" : userRole === "moderator" || userRole === "admin" ? "Moderator" : "Explorer"}</span>
             <strong>{displayName}</strong>
             <span className="session-storage">{isGuest ? "Saved locally" : "Saved to account"}</span>
           </div>
+          {(userRole === "moderator" || userRole === "admin") && !isGuest && (
+            <button
+              type="button"
+              className="session-moderate"
+              onClick={() => {
+                setShowModeratorPanel(true);
+                void refreshModeratorQueue(session, userRole);
+              }}
+            >
+              Moderate
+            </button>
+          )}
           <button type="button" className="session-logout" onClick={handleLogout}>
             Log out
           </button>
@@ -710,6 +966,139 @@ function App() {
             </button>
           </div>
         </div>
+      )}
+
+      {(userRole === "moderator" || userRole === "admin") && (
+        <>
+          <div
+            onClick={() => setShowModeratorPanel(false)}
+            className={showModeratorPanel ? "panel-scrim is-open" : "panel-scrim"}
+          />
+
+          <aside className={showModeratorPanel ? "moderator-panel is-open" : "moderator-panel"}>
+            <div className="side-panel-header">
+              <div>
+                <p className="side-panel-eyebrow">Moderator Review</p>
+                <h2 className="side-panel-title">Pending Sightings</h2>
+                <p className="list-panel-count">{moderatorQueue.length} awaiting review</p>
+              </div>
+              <button
+                type="button"
+                className="side-panel-close"
+                aria-label="Close moderator panel"
+                onClick={() => setShowModeratorPanel(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="moderator-panel-body">
+              <div className="moderator-queue">
+                {isLoadingModeratorQueue ? (
+                  <div className="list-empty-state">
+                    <p className="list-empty-title">Loading review queue</p>
+                    <p className="list-empty-copy">Gathering pending submissions from the field.</p>
+                  </div>
+                ) : moderatorQueue.length > 0 ? (
+                  moderatorQueue.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={selectedReviewItem?.id === item.id ? "moderator-queue-item is-active" : "moderator-queue-item"}
+                      onClick={() => setSelectedReviewId(item.id ?? null)}
+                    >
+                      <strong>{item.name}</strong>
+                      <span>{item.location}</span>
+                    </button>
+                  ))
+                ) : (
+                  <div className="list-empty-state">
+                    <p className="list-empty-title">No pending reviews right now</p>
+                    <p className="list-empty-copy">Fresh public submissions will appear here when explorers send them in.</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="moderator-review-card">
+                {selectedReviewItem ? (
+                  <>
+                    <div className="moderator-review-header">
+                      <div>
+                        <p className="side-panel-eyebrow">Submission</p>
+                        <h3 className="moderator-review-title">{selectedReviewItem.name}</h3>
+                      </div>
+                      <span className="detail-drawer-origin detail-drawer-origin-secondary">
+                        Pending Review
+                      </span>
+                    </div>
+
+                    <div className="moderator-review-grid">
+                      <section className="detail-drawer-section">
+                        <p className="detail-drawer-label">Location</p>
+                        <p className="detail-drawer-value">{selectedReviewItem.location}</p>
+                      </section>
+                      <section className="detail-drawer-section">
+                        <p className="detail-drawer-label">Coordinates</p>
+                        <p className="detail-drawer-coords">
+                          {selectedReviewItem.coords[0].toFixed(4)}, {selectedReviewItem.coords[1].toFixed(4)}
+                        </p>
+                      </section>
+                      <section className="detail-drawer-section">
+                        <p className="detail-drawer-label">Category</p>
+                        <p className="detail-drawer-value">{selectedReviewItem.category}</p>
+                      </section>
+                      <section className="detail-drawer-section">
+                        <p className="detail-drawer-label">Submitted By</p>
+                        <p className="detail-drawer-coords">{selectedReviewItem.ownerId ?? "Unknown user"}</p>
+                      </section>
+                      <section className="detail-drawer-section moderator-review-description">
+                        <p className="detail-drawer-label">Description</p>
+                        <p className="detail-drawer-description">{selectedReviewItem.description || "No description provided."}</p>
+                      </section>
+                    </div>
+
+                    <label className="modal-field moderator-review-notes">
+                      <span className="modal-label">Moderator Notes</span>
+                      <textarea
+                        className="modal-input modal-textarea"
+                        value={reviewNotesDraft}
+                        onChange={(event) => setReviewNotesDraft(event.target.value)}
+                        placeholder="Optional notes for the submitter..."
+                      />
+                    </label>
+
+                    {moderatorMessage && <p className="portal-message moderator-message">{moderatorMessage}</p>}
+
+                    <div className="moderator-actions">
+                      <button
+                        type="button"
+                        className="detail-drawer-button detail-drawer-button-danger"
+                        onClick={() => void handleModeratorAction("rejected")}
+                        disabled={isSubmittingReviewAction}
+                      >
+                        {isSubmittingReviewAction ? "Saving..." : "Reject"}
+                      </button>
+                      <button
+                        type="button"
+                        className="modal-submit moderator-approve"
+                        onClick={() => void handleModeratorAction("approved")}
+                        disabled={isSubmittingReviewAction}
+                      >
+                        {isSubmittingReviewAction ? "Saving..." : "Approve"}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="list-empty-state">
+                    <p className="list-empty-title">Review queue clear</p>
+                    <p className="list-empty-copy">Select a pending submission when one arrives, then approve it or send it back with notes.</p>
+                    {moderatorMessage && <p className="portal-message moderator-message">{moderatorMessage}</p>}
+                  </div>
+                )}
+              </div>
+            </div>
+          </aside>
+        </>
       )}
     </div>
   );

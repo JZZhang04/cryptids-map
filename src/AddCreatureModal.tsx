@@ -227,7 +227,7 @@ export default function AddCreatureModal({
                     onChange={() => setVisibility("private")}
                   />
                   <span className="modal-visibility-title">Only visible to you</span>
-                  <span className="modal-visibility-copy">This entry stays in your personal field guide.</span>
+                  <span className="modal-visibility-copy">This entry stays private in your personal field guide.</span>
                 </label>
                 <label className={visibility === "public" ? "modal-visibility-card is-active" : "modal-visibility-card"}>
                   <input
@@ -237,8 +237,8 @@ export default function AddCreatureModal({
                     checked={visibility === "public"}
                     onChange={() => setVisibility("public")}
                   />
-                  <span className="modal-visibility-title">Visible to everyone</span>
-                  <span className="modal-visibility-copy">Guests and other signed-in explorers can see it on the map.</span>
+                  <span className="modal-visibility-title">Submit for public review</span>
+                  <span className="modal-visibility-copy">Moderators review it before it appears to everyone on the map.</span>
                 </label>
               </div>
             </div>

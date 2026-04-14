@@ -267,6 +267,7 @@ function normalizeLocalCreature(creature: Creature): Creature {
         id: creature.id ?? createLocalCreatureId(),
         source: "user",
         visibility: creature.visibility ?? "private",
+        reviewStatus: creature.reviewStatus ?? "draft",
     };
 }
 
@@ -354,8 +355,9 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
 
             const { data: publicData, error: publicError } = await supabase
                 .from("user_cryptids")
-                .select("id, user_id, name, location, latitude, longitude, description, category, created_at, is_public")
-                .eq("is_public", true)
+                .select("id, user_id, name, location, latitude, longitude, description, category, created_at, visibility, review_status, review_notes")
+                .eq("visibility", "public")
+                .eq("review_status", "approved")
                 .order("created_at", { ascending: false });
 
             if (publicError) {
@@ -376,7 +378,9 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
                 category: row.category,
                 source: "user" as const,
                 createdAt: row.created_at,
-                visibility: row.is_public ? "public" as const : "private" as const,
+                visibility: row.visibility,
+                reviewStatus: row.review_status,
+                reviewNotes: row.review_notes ?? undefined,
             }));
 
             if (!session?.user || guestMode) {
@@ -400,7 +404,7 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
 
             const { data: ownData, error: ownError } = await supabase
                 .from("user_cryptids")
-                .select("id, user_id, name, location, latitude, longitude, description, category, created_at, is_public")
+                .select("id, user_id, name, location, latitude, longitude, description, category, created_at, visibility, review_status, review_notes")
                 .eq("user_id", session.user.id)
                 .order("created_at", { ascending: false });
 
@@ -423,7 +427,9 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
                 category: row.category,
                 source: "user" as const,
                 createdAt: row.created_at,
-                visibility: row.is_public ? "public" as const : "private" as const,
+                visibility: row.visibility,
+                reviewStatus: row.review_status,
+                reviewNotes: row.review_notes ?? undefined,
             }));
 
             setUserCreatures(mappedOwn);
@@ -530,6 +536,11 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
         ? "Saved locally in this browser as a guest entry."
         : "Saved to your signed-in account.";
 
+    const getSubmissionState = (visibility: "private" | "public") =>
+        visibility === "public"
+            ? { visibility: "public" as const, reviewStatus: "pending_review" as const }
+            : { visibility: "private" as const, reviewStatus: "draft" as const };
+
     const validateCreature = (creature: Creature) => {
         const normalizedName = creature.name.trim().toLowerCase();
         const normalizedLocation = creature.location.trim() || "Unknown";
@@ -573,6 +584,7 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
             location: normalizedLocation,
             description: normalizedDescription,
             visibility: creature.visibility ?? "private",
+            reviewStatus: creature.reviewStatus ?? "draft",
         };
     };
 
@@ -593,11 +605,15 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
     const handleSaveCreature = async (creature: Creature) => {
         const guestMode = localStorage.getItem("cryptidsGuestMode") === "true";
         const validatedCreature = validateCreature(creature);
+        const submissionState = guestMode
+            ? { visibility: "private" as const, reviewStatus: "draft" as const }
+            : getSubmissionState(validatedCreature.visibility ?? "private");
         const normalizedCreature = {
             ...validatedCreature,
             id: validatedCreature.id ?? editingCreature?.id,
             source: "user" as const,
-            visibility: guestMode ? "private" as const : validatedCreature.visibility ?? "private" as const,
+            visibility: submissionState.visibility,
+            reviewStatus: submissionState.reviewStatus,
         };
 
         if (!supabase || guestMode) {
@@ -640,7 +656,9 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
                     longitude: normalizedCreature.coords[1],
                     description: normalizedCreature.description,
                     category: normalizedCreature.category,
-                    is_public: normalizedCreature.visibility === "public",
+                    visibility: normalizedCreature.visibility,
+                    review_status: normalizedCreature.reviewStatus,
+                    review_notes: null,
                 })
                 .eq("id", editingCreature.id)
                 .eq("user_id", session.user.id);
@@ -659,7 +677,11 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
             );
             setDrawerCreature(updatedCreature);
             setEditingCreature(null);
-            setFeedbackMessage("Creature updated in your field guide.");
+            setFeedbackMessage(
+                normalizedCreature.reviewStatus === "pending_review"
+                    ? "Update saved and resubmitted for public review."
+                    : "Creature updated in your field guide."
+            );
             return;
         }
 
@@ -673,9 +695,10 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
                 longitude: normalizedCreature.coords[1],
                 description: normalizedCreature.description,
                 category: normalizedCreature.category,
-                is_public: normalizedCreature.visibility === "public",
+                visibility: normalizedCreature.visibility,
+                review_status: normalizedCreature.reviewStatus,
             })
-            .select("id, created_at, user_id, is_public")
+            .select("id, created_at, user_id, visibility, review_status, review_notes")
             .single();
 
         if (error) {
@@ -688,12 +711,18 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
             source: "user",
             createdAt: insertedRow.created_at,
             ownerId: insertedRow.user_id,
-            visibility: insertedRow.is_public ? "public" : "private",
+            visibility: insertedRow.visibility,
+            reviewStatus: insertedRow.review_status,
+            reviewNotes: insertedRow.review_notes ?? undefined,
         };
 
         setUserCreatures((prev) => [savedCreature, ...prev]);
         setDrawerCreature(savedCreature);
-        setFeedbackMessage("Creature saved to your field guide.");
+        setFeedbackMessage(
+            savedCreature.reviewStatus === "pending_review"
+                ? "Creature submitted for public review."
+                : "Creature saved to your field guide."
+        );
     };
 
     const handleEditCreature = (creature: Creature) => {
