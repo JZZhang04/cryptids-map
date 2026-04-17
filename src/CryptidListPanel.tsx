@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Creature } from "./types";
 
 const categoryColors: Record<string, string> = {
@@ -47,6 +47,7 @@ export default function CryptidListPanel({
     onClose,
 }: Props) {
     const [page, setPage] = useState(1);
+    const listBodyRef = useRef<HTMLDivElement | null>(null);
 
     const sortedAllCreatures = useMemo(
         () => [...allCreatures].sort((a, b) => a.name.localeCompare(b.name)),
@@ -92,6 +93,14 @@ export default function CryptidListPanel({
     const pagedAllCreatures = sortedAllCreatures.filter((creature) => getInitialLetter(creature.name) === currentLetter);
     const pagedPublicCreatures = sortedPublicCreatures.filter((creature) => getInitialLetter(creature.name) === currentLetter);
     const pagedUserCreatures = sortedUserCreatures.filter((creature) => getInitialLetter(creature.name) === currentLetter);
+
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        listBodyRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    }, [currentLetter, isOpen]);
 
     return (
         <>
@@ -166,7 +175,7 @@ export default function CryptidListPanel({
                     })}
                 </div>
 
-                <div className="list-panel-body">
+                <div className="list-panel-body" ref={listBodyRef}>
                     <SectionLabel label="Database" count={allCreatures.length} />
                     {pagedAllCreatures.map((c) => (
                         <CreatureRow key={c.name} creature={c} onClick={() => { onSelect(c); onClose(); }} />

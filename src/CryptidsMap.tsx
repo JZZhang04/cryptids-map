@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import "leaflet/dist/leaflet.css";
-import L, { type LatLngExpression, Icon } from "leaflet";
+import L, { type LatLngExpression } from "leaflet";
 import { useQuery } from "@apollo/client/react";
 import { supabase } from "./supabase";
 import { GET_CREATURES } from "./graphql/queries";
@@ -16,25 +16,28 @@ type ThemeType = "light" | "dark" | "gray";
 
 // Category colors
 const categoryColors: Record<string, string> = {
-    Humanoid: "violet",
-    Aquatic: "blue",
-    Flying: "orange",
-    "Beast / Monster": "red",
+    Humanoid: "#d47de8",
+    Aquatic: "#2f7fff",
+    Flying: "#f4a623",
+    "Beast / Monster": "#ff5b4d",
 };
 const ALLOWED_CATEGORIES = new Set(Object.keys(categoryColors));
 const MAX_NAME_LENGTH = 80;
 const MAX_DESCRIPTION_LENGTH = 600;
 
-// Create colored marker icon
+// Use a soft glowing circular marker so sightings read as approximate areas, not pin-point addresses.
 function createIcon(color: string) {
-    return new Icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
-        shadowUrl:
-            "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41],
+    return L.divIcon({
+        className: "cryptid-map-marker-wrapper",
+        html: `
+            <span class="cryptid-map-marker" style="--marker-color: ${color}">
+                <span class="cryptid-map-marker-halo"></span>
+                <span class="cryptid-map-marker-core"></span>
+            </span>
+        `,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -14],
     });
 }
 
@@ -56,16 +59,13 @@ const Legend = () => {
                     {Object.entries(categoryColors).map(([cat, color]) => (
                         <li key={cat} className="map-legend-item">
                             <span
-                                style={{
-                                    display: "inline-block",
-                                    width: "12px",
-                                    height: "12px",
-                                    backgroundColor: color,
-                                    borderRadius: "50%",
-                                    marginRight: "8px",
-                                    boxShadow: "0 0 0 2px rgba(255, 248, 232, 0.08)",
-                                }}
-                            ></span>
+                                className="map-legend-swatch"
+                                style={{ "--marker-color": color } as React.CSSProperties}
+                                aria-hidden="true"
+                            >
+                                <span className="map-legend-swatch-halo"></span>
+                                <span className="map-legend-swatch-core"></span>
+                            </span>
                             {cat}
                         </li>
                     ))}
