@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { generateCreatureDescriptionDraft } from "./ai";
 import type { Creature } from "./types";
 
 const CATEGORIES = ["Humanoid", "Aquatic", "Flying", "Beast / Monster"];
@@ -34,7 +35,9 @@ export default function AddCreatureModal({
   const [category, setCategory] = useState("Humanoid");
   const [visibility, setVisibility] = useState<"private" | "public">("private");
   const [error, setError] = useState("");
+  const [aiMessage, setAiMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const isEditing = Boolean(initialCreature);
 
   useEffect(() => {
@@ -47,6 +50,7 @@ export default function AddCreatureModal({
       setCategory("Humanoid");
       setVisibility("private");
       setError("");
+      setAiMessage("");
       return;
     }
 
@@ -58,6 +62,7 @@ export default function AddCreatureModal({
     setCategory(initialCreature.category);
     setVisibility(initialCreature.visibility ?? "private");
     setError("");
+    setAiMessage("");
   }, [initialCreature]);
 
   useEffect(() => {
@@ -69,6 +74,7 @@ export default function AddCreatureModal({
 
   const handleSubmit = async () => {
     setError("");
+    setAiMessage("");
     const trimmedName = name.trim();
     const trimmedLocation = location.trim() || "Unknown";
     const trimmedDescription = description.trim();
@@ -122,6 +128,45 @@ export default function AddCreatureModal({
       setError(message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleGenerateDescription = async () => {
+    setError("");
+    setAiMessage("");
+
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setError("Add a creature name before generating a description.");
+      return;
+    }
+
+    if (trimmedName.length > MAX_NAME_LENGTH) {
+      setError(`Name must be ${MAX_NAME_LENGTH} characters or fewer.`);
+      return;
+    }
+
+    try {
+      setIsGeneratingDescription(true);
+      const result = await generateCreatureDescriptionDraft({
+        name: trimmedName,
+        location: location.trim() || "Unknown",
+        category,
+        existingDescription: description.trim() || undefined,
+      });
+
+      setDescription(result.description.trim());
+      setAiMessage(
+        result.guidance ?? "AI-assisted draft inserted. Review and refine it before saving."
+      );
+    } catch (generateError) {
+      const message =
+        generateError instanceof Error
+          ? generateError.message
+          : "Unable to generate a description right now.";
+      setError(message);
+    } finally {
+      setIsGeneratingDescription(false);
     }
   };
 
@@ -245,7 +290,17 @@ export default function AddCreatureModal({
           )}
 
           <label className="modal-field">
-            <span className="modal-label">Description</span>
+            <div className="modal-label-row">
+              <span className="modal-label">Description</span>
+              <button
+                type="button"
+                className="modal-ai-button"
+                onClick={handleGenerateDescription}
+                disabled={isSubmitting || isGeneratingDescription}
+              >
+                {isGeneratingDescription ? "Summoning lore..." : "Generate AI Description"}
+              </button>
+            </div>
             <textarea
               className="modal-input modal-textarea"
               value={description}
@@ -253,7 +308,12 @@ export default function AddCreatureModal({
               placeholder="Describe the creature..."
               maxLength={MAX_DESCRIPTION_LENGTH}
             />
+            <p className="modal-inline-note">
+              AI can draft a short field-guide description based on the creature name, location,
+              and category. Review before saving.
+            </p>
             <p className="modal-help">{description.trim().length}/{MAX_DESCRIPTION_LENGTH} characters</p>
+            {aiMessage && <p className="modal-ai-message">{aiMessage}</p>}
           </label>
 
           {error && <p className="modal-error">{error}</p>}

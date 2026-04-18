@@ -1617,12 +1617,36 @@
   gap: 8px;
 }
 
+.modal-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .modal-label {
   color: #d5b46a;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.modal-ai-button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(240, 193, 95, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 248, 232, 0.08);
+  color: #fff4d6;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.modal-ai-button:disabled {
+  opacity: 0.62;
+  cursor: wait;
 }
 
 .modal-input,
@@ -1673,6 +1697,21 @@
   color: rgba(255, 248, 232, 0.56);
   font-size: 0.82rem;
   line-height: 1.5;
+}
+
+.modal-inline-note,
+.modal-ai-message {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.modal-inline-note {
+  color: rgba(255, 248, 232, 0.56);
+}
+
+.modal-ai-message {
+  color: #f5d58e;
 }
 
 .modal-select {
