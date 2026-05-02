@@ -1,6 +1,6 @@
 # OpenAI AI Assist Setup
 
-This project's first AI-assisted description flow uses a Supabase Edge Function as a secure proxy to OpenAI.
+This project's first version AI-assisted description flow uses a Supabase Edge Function as a secure proxy to OpenAI.
 
 ## What it does
 
