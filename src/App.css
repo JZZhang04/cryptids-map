@@ -1801,13 +1801,37 @@
 }
 
 @media (max-width: 720px) {
+  .app-shell {
+    height: 100dvh;
+  }
+
   .portal-card {
-    top: 16px;
-    padding: 22px 18px;
+    top: max(12px, env(safe-area-inset-top));
+    width: calc(100vw - 24px);
+    max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
+    box-sizing: border-box;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
+    border-radius: 22px;
+  }
+
+  .portal-card h1 {
+    font-size: clamp(2rem, 10vw, 2.6rem);
+    line-height: 1.05;
+  }
+
+  .portal-intro {
+    margin: 14px 0 18px;
+    font-size: 0.98rem;
+    line-height: 1.58;
   }
 
   .portal-tabs {
     width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 18px;
   }
 
   .portal-tab {
