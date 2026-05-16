@@ -276,6 +276,113 @@ type CryptidsMapProps = {
     refreshToken?: number;
 };
 
+function FieldGuideStatsPanel({
+    databaseCreatures,
+    publicCreatures,
+    userCreatures,
+    showReviewStatus,
+    onClose,
+}: {
+    databaseCreatures: Creature[];
+    publicCreatures: Creature[];
+    userCreatures: Creature[];
+    showReviewStatus: boolean;
+    onClose: () => void;
+}) {
+    const visibleCreatures = [...databaseCreatures, ...publicCreatures, ...userCreatures];
+    const totalVisible = visibleCreatures.length;
+    const categoryCounts = Object.keys(categoryColors).map((category) => ({
+        category,
+        color: categoryColors[category],
+        count: visibleCreatures.filter((creature) => creature.category === category).length,
+    }));
+    const largestCategoryCount = Math.max(...categoryCounts.map((item) => item.count), 1);
+    const sourceCounts = [
+        { label: "Database", count: databaseCreatures.length },
+        { label: "Community", count: publicCreatures.length },
+        { label: "Yours", count: userCreatures.length },
+    ];
+    const reviewStatusCounts = [
+        { label: "Draft", count: userCreatures.filter((creature) => (creature.reviewStatus ?? "draft") === "draft").length },
+        { label: "Pending", count: userCreatures.filter((creature) => creature.reviewStatus === "pending_review").length },
+        { label: "Approved", count: userCreatures.filter((creature) => creature.reviewStatus === "approved").length },
+        { label: "Rejected", count: userCreatures.filter((creature) => creature.reviewStatus === "rejected").length },
+    ];
+
+    return (
+        <aside className="field-stats-panel header-panel" aria-label="Field guide statistics">
+            <div className="field-stats-header">
+                <div>
+                    <p className="side-panel-eyebrow">Field Guide Stats</p>
+                    <h2 className="field-stats-title">Statistics</h2>
+                </div>
+                <button
+                    type="button"
+                    className="side-panel-close field-stats-close"
+                    onClick={onClose}
+                    aria-label="Close statistics panel"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <div className="field-stats-total">
+                <span>Total visible cryptids</span>
+                <strong>{totalVisible}</strong>
+            </div>
+
+            <section className="field-stats-section">
+                <h3>Category distribution</h3>
+                <div className="field-stats-bars">
+                    {categoryCounts.map((item) => (
+                        <div className="field-stats-bar-row" key={item.category}>
+                            <div className="field-stats-bar-label">
+                                <span>{item.category}</span>
+                                <strong>{item.count}</strong>
+                            </div>
+                            <div className="field-stats-bar-track">
+                                <span
+                                    className="field-stats-bar-fill"
+                                    style={{
+                                        width: `${(item.count / largestCategoryCount) * 100}%`,
+                                        "--stats-color": item.color,
+                                    } as React.CSSProperties}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="field-stats-section">
+                <h3>Source breakdown</h3>
+                <div className="field-stats-source-grid">
+                    {sourceCounts.map((item) => (
+                        <div className="field-stats-source-card" key={item.label}>
+                            <span>{item.label}</span>
+                            <strong>{item.count}</strong>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {showReviewStatus && (
+                <section className="field-stats-section">
+                    <h3>Review status</h3>
+                    <div className="field-stats-review-grid">
+                        {reviewStatusCounts.map((item) => (
+                            <div className="field-stats-review-item" key={item.label}>
+                                <span>{item.label}</span>
+                                <strong>{item.count}</strong>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+        </aside>
+    );
+}
+
 export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: CryptidsMapProps) {
     const usaCenter: LatLngExpression = [39.8283, -98.5795];
     const worldBounds = L.latLngBounds(
@@ -294,6 +401,7 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingCreature, setEditingCreature] = useState<Creature | null>(null);
     const [showListPanel, setShowListPanel] = useState(false);
+    const [showStatsPanel, setShowStatsPanel] = useState(false);
     const [isPicking, setIsPicking] = useState(false);
     const [pickedCoords, setPickedCoords] = useState<[number, number] | null>(null);
     const [isLoadingUserCreatures, setIsLoadingUserCreatures] = useState(true);
@@ -920,24 +1028,48 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
                 currentUserId={currentUserId}
             />
             {/* Bottom-right action buttons */}
-            <div className="map-actions header-panel">
-                <button
-                    onClick={() => setShowListPanel(true)}
-                    className="map-actions-button"
-                >
-                    All Cryptids
-                </button>
-                <button
-                    onClick={() => {
-                        setPickedCoords(null);
-                        setEditingCreature(null);
-                        setShowAddModal(true);
-                    }}
-                    title="Add a new creature"
-                    className="map-actions-add"
-                >
-                    +
-                </button>
+            <div className="map-actions-stack">
+                {showStatsPanel && (
+                    <FieldGuideStatsPanel
+                        databaseCreatures={filteredCreatures}
+                        publicCreatures={filteredPublicCreatures}
+                        userCreatures={filteredUserCreatures}
+                        showReviewStatus={!isGuest && Boolean(currentUserId)}
+                        onClose={() => setShowStatsPanel(false)}
+                    />
+                )}
+
+                <div className="map-actions header-panel">
+                    <button
+                        onClick={() => setShowListPanel(true)}
+                        className="map-actions-button"
+                    >
+                        <span className="map-actions-icon" aria-hidden="true">☰</span>
+                        <span>All Cryptids</span>
+                    </button>
+                    <button
+                        type="button"
+                        className="map-actions-button"
+                        onClick={() => setShowStatsPanel((isOpen) => !isOpen)}
+                        aria-expanded={showStatsPanel}
+                    >
+                        <span className="map-actions-icon" aria-hidden="true">▥</span>
+                        <span>Statistics</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setPickedCoords(null);
+                            setEditingCreature(null);
+                            setShowAddModal(true);
+                        }}
+                        title="Add a new creature"
+                        className="map-actions-button"
+                    >
+                        <span className="map-actions-icon" aria-hidden="true">+</span>
+                        <span>Add Your Own</span>
+                    </button>
+                </div>
             </div>
 
             {/* All Cryptids list panel */}
