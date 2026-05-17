@@ -356,15 +356,17 @@ function App() {
 
       if (session) {
         localStorage.removeItem(GUEST_STORAGE_KEY);
-        const role = await getUserRole(session);
+        const [role] = await Promise.all([
+          getUserRole(session),
+          refreshMigrationState(session),
+          refreshApprovedNotices(session),
+        ]);
         setSession(session);
         setUserRole(role);
         setIsGuest(false);
         setIsAuthenticated(true);
         setDisplayName(getDisplayName(session));
-        await refreshMigrationState(session);
         await refreshModeratorQueue(session, role);
-        await refreshApprovedNotices(session);
       } else if (guestMode) {
         setSession(null);
         setUserRole("user");
@@ -402,7 +404,11 @@ function App() {
         if (session) {
           localStorage.removeItem(GUEST_STORAGE_KEY);
           void (async () => {
-            const role = await getUserRole(session);
+            const [role] = await Promise.all([
+              getUserRole(session),
+              refreshMigrationState(session),
+              refreshApprovedNotices(session),
+            ]);
             setSession(session);
             setUserRole(role);
             setIsGuest(false);
@@ -410,9 +416,7 @@ function App() {
             setDisplayName(getDisplayName(session));
             setAuthMessage("");
             setDismissedMigrationPrompt(false);
-            await refreshMigrationState(session);
             await refreshModeratorQueue(session, role);
-            await refreshApprovedNotices(session);
           })();
         } else {
           const guestMode = localStorage.getItem(GUEST_STORAGE_KEY) === "true";

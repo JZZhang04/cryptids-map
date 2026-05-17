@@ -620,16 +620,18 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
                 }
             }
 
-            const {
-                data: { session },
-            } = await supabase.auth.getSession();
-
-            const { data: publicData, error: publicError } = await supabase
-                .from("user_cryptids")
-                .select("id, user_id, name, location, latitude, longitude, description, category, created_at, visibility, review_status, review_notes")
-                .eq("visibility", "public")
-                .eq("review_status", "approved")
-                .order("created_at", { ascending: false });
+            const [
+                { data: { session } },
+                { data: publicData, error: publicError },
+            ] = await Promise.all([
+                supabase.auth.getSession(),
+                supabase
+                    .from("user_cryptids")
+                    .select("id, user_id, name, location, latitude, longitude, description, category, created_at, visibility, review_status, review_notes")
+                    .eq("visibility", "public")
+                    .eq("review_status", "approved")
+                    .order("created_at", { ascending: false }),
+            ]);
 
             if (publicError) {
                 console.error("Failed to load public cryptids:", publicError.message);
