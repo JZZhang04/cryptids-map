@@ -530,7 +530,7 @@
         "category": "Aquatic"
     },
     {
-        "name": "Shennongjia Wildman (神农架野人)",
+        "name": "Shennongjia Wildman",
         "location": "Shennongjia Forest District, Hubei, China",
         "coords": [
             31.5,
@@ -540,7 +540,7 @@
         "category": "Humanoid"
     },
     {
-        "name": "Kanas Lake Monster (喀纳斯湖‘大红鱼’)",
+        "name": "Kanas Lake Monster",
         "location": "Kanas Lake, Altay Prefecture, Xinjiang, China",
         "coords": [
             48.7,
@@ -550,7 +550,7 @@
         "category": "Aquatic"
     },
     {
-        "name": "Tianchi Monster (长白山天池水怪)",
+        "name": "Tianchi Monster",
         "location": "Heaven Lake, Changbai Mountain, Jilin, China",
         "coords": [
             42.006,
@@ -560,7 +560,7 @@
         "category": "Aquatic"
     },
     {
-        "name": "Qinghai Lake Monster (青海湖水怪)",
+        "name": "Qinghai Lake Monster",
         "location": "Qinghai Lake, Qinghai, China",
         "coords": [
             36.9,
@@ -570,7 +570,7 @@
         "category": "Aquatic"
     },
     {
-        "name": "Jingpo Lake Monster (镜泊湖水怪)",
+        "name": "Jingpo Lake Monster",
         "location": "Jingpo Lake, Heilongjiang, China",
         "coords": [
             44.1,
@@ -580,7 +580,7 @@
         "category": "Aquatic"
     },
     {
-        "name": "‘Laoye Temple’ Waters Phenomena (鄱阳湖老爷庙水域异常浪涌/水怪传说)",
+        "name": "Laoye Temple Waters Phenomena",
         "location": "Laoye Temple Waters, Poyang Lake, Jiangxi, China",
         "coords": [
             29.5,
@@ -590,7 +590,7 @@
         "category": "Aquatic"
     },
     {
-        "name": "Shuihouzi (水猴子)",
+        "name": "Shuihouzi",
         "location": "Lower Yangtze and Dongting-Tai Lake region, China",
         "coords": [
             29.2,
@@ -600,7 +600,7 @@
         "category": "Beast / Monster"
     },
     {
-        "name": "Three-Legged Beast (三足兽)",
+        "name": "Three-Legged Beast",
         "location": "Changbai Mountain region, Jilin, China",
         "coords": [
             42.1,
@@ -610,7 +610,7 @@
         "category": "Beast / Monster"
     },
     {
-        "name": "Flying Fox (飞狐，非蝙蝠)",
+        "name": "Flying Fox",
         "location": "North of the Great Wall, Hebei-Shanxi border region, China",
         "coords": [
             39.84,
@@ -620,7 +620,7 @@
         "category": "Flying"
     },
     {
-        "name": "Fruit-Leopard (果下豹)",
+        "name": "Fruit-Leopard",
         "location": "Mount Luofu, Huizhou, Guangdong, China",
         "coords": [
             23.28,
@@ -630,7 +630,7 @@
         "category": "Beast / Monster"
     },
     {
-        "name": "Sea Monk (海和尚)",
+        "name": "Sea Monk",
         "location": "Bohai and Yellow Sea coast, China",
         "coords": [
             36.1,
@@ -640,7 +640,7 @@
         "category": "Aquatic"
     },
     {
-        "name": "One-legged Serpent (一足蛇)",
+        "name": "One-legged Serpent",
         "location": "Lower Yangtze region, China",
         "coords": [
             30.3,
@@ -650,7 +650,7 @@
         "category": "Beast / Monster"
     },
     {
-        "name": "Earth-Burrow Beast (土窟异兽)",
+        "name": "Earth-Burrow Beast",
         "location": "Loess cave region of North China",
         "coords": [
             35.0,
@@ -660,7 +660,7 @@
         "category": "Beast / Monster"
     },
     {
-        "name": "Dongting Lake ‘Water Ape’ Cluster (洞庭湖水怪/水猴子传说群)",
+        "name": "Dongting Lake Water Ape Cluster",
         "location": "Dongting Lake, Hunan, China",
         "coords": [
             29.07,
@@ -670,7 +670,7 @@
         "category": "Aquatic"
     },
     {
-        "name": "Qiangtang Plateau ‘Yeti’ Reports (羌塘/藏区雪人/野人报告)",
+        "name": "Qiangtang Plateau Yeti Reports",
         "location": "Ngari and Qiangtang Plateau, Tibet, China",
         "coords": [
             33.5,
@@ -680,7 +680,7 @@
         "category": "Humanoid"
     },
     {
-        "name": "Yingkou Fallen Dragon (营口坠龙)",
+        "name": "Yingkou Fallen Dragon",
         "location": "Yingkou, Liaoning, China",
         "coords": [
             40.67,
@@ -690,7 +690,7 @@
         "category": "Beast / Monster"
     },
     {
-        "name": "Donkey-Headed Wolf (驴头狼)",
+        "name": "Donkey-Headed Wolf",
         "location": "Hubei, China",
         "coords": [
             31.0,
@@ -700,7 +700,7 @@
         "category": "Beast / Monster"
     },
     {
-        "name": "Red Willow Child (红柳娃)",
+        "name": "Red Willow Child",
         "location": "Taklamakan Desert fringe, Xinjiang, China",
         "coords": [
             39.0,
