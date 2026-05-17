@@ -2,6 +2,8 @@
 
 This project's first version AI-assisted description flow uses a Supabase Edge Function as a secure proxy to OpenAI.
 
+It's still being tested and not fully completed.
+
 ## What it does
 
 - Adds a `Generate Description` button inside the Add Creature modal
