@@ -24,6 +24,7 @@ const categoryColors: Record<string, string> = {
 const ALLOWED_CATEGORIES = new Set(Object.keys(categoryColors));
 const MAX_NAME_LENGTH = 80;
 const MAX_DESCRIPTION_LENGTH = 600;
+const DATABASE_ENTRY_ADDED_AT = "2026-04-04T00:00:00.000Z";
 
 // Use a soft glowing circular marker so sightings read as approximate areas, not pin-point addresses.
 function createIcon(color: string) {
@@ -289,7 +290,16 @@ function FieldGuideStatsPanel({
     showReviewStatus: boolean;
     onClose: () => void;
 }) {
+    const [timelineMode, setTimelineMode] = useState<"total" | "new">("new");
     const visibleCreatures = [...databaseCreatures, ...publicCreatures, ...userCreatures];
+    const timelineCreatures = [
+        ...databaseCreatures.map((creature) => ({
+            ...creature,
+            createdAt: creature.createdAt ?? DATABASE_ENTRY_ADDED_AT,
+        })),
+        ...publicCreatures,
+        ...userCreatures,
+    ].filter((creature) => creature.createdAt);
     const totalVisible = visibleCreatures.length;
     const categoryCounts = Object.keys(categoryColors).map((category) => ({
         category,
@@ -308,6 +318,15 @@ function FieldGuideStatsPanel({
         { label: "Approved", count: userCreatures.filter((creature) => creature.reviewStatus === "approved").length },
         { label: "Rejected", count: userCreatures.filter((creature) => creature.reviewStatus === "rejected").length },
     ];
+    const timelinePoints = buildTimelinePoints(timelineCreatures, timelineMode);
+    const timelinePath = buildTimelinePath(timelinePoints);
+    const timelineAreaPath = timelinePath
+        ? `${timelinePath} L 100 72 L 0 72 Z`
+        : "";
+    const timelineDotPoints = timelinePoints.filter((point) => point.value > 0);
+    const timelineMax = Math.max(...timelinePoints.map((point) => point.value), 0);
+    const timelineTitle =
+        timelineMode === "total" ? "Total entries by day" : "New entries by day";
 
     return (
         <aside className="field-stats-panel header-panel" aria-label="Field guide statistics">
@@ -326,61 +345,205 @@ function FieldGuideStatsPanel({
                 </button>
             </div>
 
-            <div className="field-stats-total">
-                <span>Total visible cryptids</span>
-                <strong>{totalVisible}</strong>
-            </div>
-
-            <section className="field-stats-section">
-                <h3>Category distribution</h3>
-                <div className="field-stats-bars">
-                    {categoryCounts.map((item) => (
-                        <div className="field-stats-bar-row" key={item.category}>
-                            <div className="field-stats-bar-label">
-                                <span>{item.category}</span>
-                                <strong>{item.count}</strong>
-                            </div>
-                            <div className="field-stats-bar-track">
-                                <span
-                                    className="field-stats-bar-fill"
-                                    style={{
-                                        width: `${(item.count / largestCategoryCount) * 100}%`,
-                                        "--stats-color": item.color,
-                                    } as React.CSSProperties}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            <section className="field-stats-section">
-                <h3>Source breakdown</h3>
-                <div className="field-stats-source-grid">
-                    {sourceCounts.map((item) => (
-                        <div className="field-stats-source-card" key={item.label}>
-                            <span>{item.label}</span>
-                            <strong>{item.count}</strong>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {showReviewStatus && (
-                <section className="field-stats-section">
-                    <h3>Review status</h3>
-                    <div className="field-stats-review-grid">
-                        {reviewStatusCounts.map((item) => (
-                            <div className="field-stats-review-item" key={item.label}>
-                                <span>{item.label}</span>
-                                <strong>{item.count}</strong>
-                            </div>
-                        ))}
+            <div className="field-stats-layout">
+                <div className="field-stats-summary">
+                    <div className="field-stats-total">
+                        <span>Total visible cryptids</span>
+                        <strong>{totalVisible}</strong>
                     </div>
+
+                    <section className="field-stats-section">
+                        <h3>Category distribution</h3>
+                        <div className="field-stats-bars">
+                            {categoryCounts.map((item) => (
+                                <div className="field-stats-bar-row" key={item.category}>
+                                    <div className="field-stats-bar-label">
+                                        <span>{item.category}</span>
+                                        <strong>{item.count}</strong>
+                                    </div>
+                                    <div className="field-stats-bar-track">
+                                        <span
+                                            className="field-stats-bar-fill"
+                                            style={{
+                                                width: `${(item.count / largestCategoryCount) * 100}%`,
+                                                "--stats-color": item.color,
+                                            } as React.CSSProperties}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    <section className="field-stats-section">
+                        <h3>Source breakdown</h3>
+                        <div className="field-stats-source-grid">
+                            {sourceCounts.map((item) => (
+                                <div className="field-stats-source-card" key={item.label}>
+                                    <span>{item.label}</span>
+                                    <strong>{item.count}</strong>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {showReviewStatus && (
+                        <section className="field-stats-section">
+                            <h3>Review status</h3>
+                            <div className="field-stats-review-grid">
+                                {reviewStatusCounts.map((item) => (
+                                    <div className="field-stats-review-item" key={item.label}>
+                                        <span>{item.label}</span>
+                                        <strong>{item.count}</strong>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+                </div>
+
+                <section className="field-stats-section field-stats-timeline">
+                    <div className="field-stats-section-heading">
+                        <h3>Entries over time</h3>
+                        <div className="field-stats-toggle" aria-label="Timeline metric">
+                            <button
+                                type="button"
+                                className={timelineMode === "total" ? "is-active" : ""}
+                                onClick={() => setTimelineMode("total")}
+                            >
+                                Total
+                            </button>
+                            <button
+                                type="button"
+                                className={timelineMode === "new" ? "is-active" : ""}
+                                onClick={() => setTimelineMode("new")}
+                            >
+                                New
+                            </button>
+                        </div>
+                    </div>
+
+                    {timelinePoints.length > 0 ? (
+                        <div className="field-stats-chart" role="img" aria-label={timelineTitle}>
+                            <div className="field-stats-chart-topline">
+                                <span>{timelineTitle}</span>
+                                <strong>{timelineMode === "total" ? timelinePoints.at(-1)?.value ?? 0 : timelineMax}</strong>
+                            </div>
+                            <svg viewBox="0 0 100 76" preserveAspectRatio="none" className="field-stats-line-chart">
+                                <path className="field-stats-line-area" d={timelineAreaPath} />
+                                <path className="field-stats-line-path" d={timelinePath} />
+                                {timelineDotPoints.map((point) => (
+                                    <circle
+                                        key={point.dateKey}
+                                        className="field-stats-line-dot"
+                                        cx={point.x}
+                                        cy={point.y}
+                                        r="1.35"
+                                    />
+                                ))}
+                            </svg>
+                            <div className="field-stats-chart-axis">
+                                <span>{formatTimelineLabel(timelinePoints[0].dateKey)}</span>
+                                <span>{formatTimelineLabel(timelinePoints[timelinePoints.length - 1].dateKey)}</span>
+                            </div>
+                            <p className="field-stats-chart-note">
+                                Daily counts from the earliest saved date to the latest saved date. Database entries use the seed date {formatTimelineLabel(DATABASE_ENTRY_ADDED_AT.slice(0, 10))}.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="field-stats-empty-chart">
+                            No dated entries match this filter yet.
+                        </div>
+                    )}
                 </section>
-            )}
+            </div>
         </aside>
     );
+}
+
+function buildTimelinePoints(
+    creatures: Creature[],
+    mode: "total" | "new"
+) {
+    const parsedDates = creatures
+        .map((creature) => (creature.createdAt ? new Date(creature.createdAt) : null))
+        .filter((date): date is Date => Boolean(date && !Number.isNaN(date.getTime())))
+        .sort((a, b) => a.getTime() - b.getTime());
+
+    if (parsedDates.length === 0) {
+        return [];
+    }
+
+    const countsByDate = new Map<string, number>();
+    parsedDates.forEach((date) => {
+        const dateKey = date.toISOString().slice(0, 10);
+        countsByDate.set(dateKey, (countsByDate.get(dateKey) ?? 0) + 1);
+    });
+
+    const savedDateKeys = Array.from(countsByDate.keys()).sort();
+    const dateKeys = buildDailyDateKeys(savedDateKeys[0], savedDateKeys[savedDateKeys.length - 1]);
+    const dailyValues: number[] = [];
+    let runningTotal = 0;
+
+    dateKeys.forEach((dateKey) => {
+        const newCount = countsByDate.get(dateKey) ?? 0;
+        runningTotal += newCount;
+        dailyValues.push(mode === "total" ? runningTotal : newCount);
+    });
+
+    const maxValue = Math.max(...dailyValues, 1);
+    const lastIndex = Math.max(dateKeys.length - 1, 1);
+
+    return dateKeys.map((dateKey, index) => {
+        const value = dailyValues[index];
+        return {
+            dateKey,
+            value,
+            x: (index / lastIndex) * 100,
+            y: 72 - (value / maxValue) * 64,
+        };
+    });
+}
+
+function buildTimelinePath(points: ReturnType<typeof buildTimelinePoints>) {
+    if (points.length === 0) {
+        return "";
+    }
+
+    if (points.length === 1) {
+        const point = points[0];
+        return `M 0 ${point.y} L 100 ${point.y}`;
+    }
+
+    return points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
+}
+
+function buildDailyDateKeys(startDateKey: string, endDateKey: string) {
+    const dateKeys: string[] = [];
+    const currentDate = new Date(`${startDateKey}T00:00:00.000Z`);
+    const endDate = new Date(`${endDateKey}T00:00:00.000Z`);
+
+    while (currentDate.getTime() <= endDate.getTime()) {
+        dateKeys.push(currentDate.toISOString().slice(0, 10));
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+    }
+
+    return dateKeys;
+}
+
+function formatTimelineLabel(dateKey: string) {
+    const date = new Date(`${dateKey}T00:00:00.000Z`);
+
+    if (Number.isNaN(date.getTime())) {
+        return dateKey;
+    }
+
+    return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+    }).format(date);
 }
 
 export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: CryptidsMapProps) {
@@ -738,7 +901,10 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
                 return;
             }
 
-            const newCreature = normalizeLocalCreature(normalizedCreature);
+            const newCreature = normalizeLocalCreature({
+                ...normalizedCreature,
+                createdAt: normalizedCreature.createdAt ?? new Date().toISOString(),
+            });
             const updated = [newCreature, ...userCreatures];
             persistLocalCreatures(updated);
             setDrawerCreature(newCreature);
