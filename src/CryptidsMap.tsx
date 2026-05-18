@@ -584,7 +584,11 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
     }, [feedbackMessage]);
 
     useEffect(() => {
-        const loadUserCreatures = async () => {
+        const loadUserCreatures = async ({ showLoading = false } = {}) => {
+            if (showLoading) {
+                setIsLoadingUserCreatures(true);
+            }
+
             const guestMode = localStorage.getItem("cryptidsGuestMode") === "true";
 
             if (!supabase) {
@@ -710,7 +714,7 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
             setIsLoadingUserCreatures(false);
         };
 
-        loadUserCreatures();
+        loadUserCreatures({ showLoading: isLoadingUserCreatures });
 
         if (!supabase) {
             return;
@@ -719,7 +723,6 @@ export default function CryptidsMap({ isGuest = false, refreshToken = 0 }: Crypt
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange(() => {
-            setIsLoadingUserCreatures(true);
             loadUserCreatures();
         });
 
