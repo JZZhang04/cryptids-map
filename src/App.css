@@ -1194,6 +1194,16 @@
   }
 }
 
+@media (max-width: 380px) {
+  .trait-chart {
+    grid-template-columns: 1fr;
+  }
+
+  .trait-chart-radar {
+    justify-self: center;
+  }
+}
+
 .map-legend {
   position: fixed;
   left: 32px;
@@ -1791,6 +1801,83 @@
   color: rgba(255, 248, 232, 0.7);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.92rem;
+}
+
+.trait-chart {
+  display: grid;
+  grid-template-columns: 132px 1fr;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+}
+
+.trait-chart-radar {
+  width: 132px;
+  height: 132px;
+  overflow: visible;
+}
+
+.trait-chart-guide {
+  fill: rgba(255, 248, 232, 0.025);
+  stroke: rgba(240, 193, 95, 0.18);
+  stroke-width: 1;
+}
+
+.trait-chart-spoke {
+  stroke: rgba(255, 248, 232, 0.1);
+  stroke-width: 1;
+}
+
+.trait-chart-shape {
+  fill: rgba(240, 193, 95, 0.22);
+  stroke: #f0c15f;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 10px rgba(240, 193, 95, 0.16));
+}
+
+.trait-chart-list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.trait-chart-row {
+  display: grid;
+  grid-template-columns: 74px minmax(46px, 1fr) 30px;
+  gap: 8px;
+  align-items: center;
+  color: rgba(255, 248, 232, 0.72);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.trait-chart-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trait-chart-row strong {
+  color: #fff8e8;
+  font-size: 0.78rem;
+  line-height: 1;
+  text-align: right;
+}
+
+.trait-chart-track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 248, 232, 0.09);
+}
+
+.trait-chart-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d5b46a, #f0c15f);
 }
 
 .detail-drawer-description {
