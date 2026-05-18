@@ -11,7 +11,7 @@ This project turns the United States (and the whole world later)into a browsable
 
 ## What It Does
 
-- Explore a map of built-in cryptid entries across the U.S. and China.
+- Explore a map of built-in cryptid entries across the world (currently support data in U.S. and China).
 - Search by creature name and filter by category.
 - Switch map themes and browse an in-app legend.
 - Open a beginner guide overlay after entering the map.
@@ -24,11 +24,11 @@ This project turns the United States (and the whole world later)into a browsable
 - Save guest entries locally, then migrate selected ones into your account later.
 - Preview guest migrations before importing, choose specific entries, and see which ones will be skipped.
 
+![Cryptids Field Guide screenshot 2](docs/stat.png)
+
 ## Why It Exists
 
-Because a normal spreadsheet of “Mothman, Jersey Devil, Dover Demon” is technically useful but spiritually incorrect.
-
-Cryptids deserve atmosphere.
+Because a normal spreadsheet of “Mothman, Jersey Devil, Dover Demon” is technically useful but spiritually boring. Cryptids deserve atmosphere.
 
 ## Current Feature Highlights
 
@@ -41,12 +41,16 @@ Cryptids deserve atmosphere.
 - Light, gray, and dark basemap modes
 - Bounded map panning so the map does not scroll forever
 
+![Cryptids Field Guide screenshot 3](docs/all.png)
+
 ### Field Guide UI
 
 - Custom black-and-gold “field guide” interface
 - Unified header panels, side drawers, modals, legend, and action buttons
 - Guided onboarding callouts for first-time entry into the map
 - Friendly empty states, save feedback, and clearer error messaging
+
+![Cryptids Field Guide screenshot](docs/detail.png)
 
 ### Auth And User Data
 
@@ -57,6 +61,8 @@ Cryptids deserve atmosphere.
 - Local guest entries stored in `localStorage`
 - Guest-to-account migration flow
 
+![Cryptids Field Guide screenshot 4](docs/login.png)
+
 ### Visibility Controls
 
 When a signed-in user adds or edits a creature, they can choose:
@@ -65,6 +71,8 @@ When a signed-in user adds or edits a creature, they can choose:
 - `Visible to everyone`
 
 Public entries show up for all visitors, including guests. Private entries stay inside the owner’s personal field guide.
+
+![Cryptids Field Guide screenshot 5](docs/add.png)
 
 ## Tech Stack
 
