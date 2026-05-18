@@ -2,10 +2,6 @@
 
 A map-based field journal for folklore, monster stories, regional sightings, and the strange creatures people swear they almost definitely saw.
 
-## Screenshot
-
-![Cryptids Field Guide screenshot](docs/cryptids-field-guide-screenshot.png)
-
 
 This project turns the United States (and the whole world later)into a browsable cryptid atlas: part campfire archive, part interactive map, part playful reminder that not every “eyewitness account” should be mistaken for zoology. Most cryptids are best understood as folklore, misidentification, exaggeration, or cultural storytelling rather than scientifically verified animals, and this app leans into that mystery with curiosity instead of pretending to be a lab report.
 
@@ -24,7 +20,6 @@ This project turns the United States (and the whole world later)into a browsable
 - Save guest entries locally, then migrate selected ones into your account later.
 - Preview guest migrations before importing, choose specific entries, and see which ones will be skipped.
 
-![Cryptids Field Guide screenshot 2](docs/stat.png)
 
 ## Why It Exists
 
@@ -41,8 +36,6 @@ Because a normal spreadsheet of “Mothman, Jersey Devil, Dover Demon” is tech
 - Light, gray, and dark basemap modes
 - Bounded map panning so the map does not scroll forever
 
-![Cryptids Field Guide screenshot 3](docs/all.png)
-
 ### Field Guide UI
 
 - Custom black-and-gold “field guide” interface
@@ -50,7 +43,6 @@ Because a normal spreadsheet of “Mothman, Jersey Devil, Dover Demon” is tech
 - Guided onboarding callouts for first-time entry into the map
 - Friendly empty states, save feedback, and clearer error messaging
 
-![Cryptids Field Guide screenshot](docs/detail.png)
 
 ### Auth And User Data
 
@@ -61,7 +53,6 @@ Because a normal spreadsheet of “Mothman, Jersey Devil, Dover Demon” is tech
 - Local guest entries stored in `localStorage`
 - Guest-to-account migration flow
 
-![Cryptids Field Guide screenshot 4](docs/login.png)
 
 ### Visibility Controls
 
@@ -72,7 +63,6 @@ When a signed-in user adds or edits a creature, they can choose:
 
 Public entries show up for all visitors, including guests. Private entries stay inside the owner’s personal field guide.
 
-![Cryptids Field Guide screenshot 5](docs/add.png)
 
 ## Tech Stack
 
