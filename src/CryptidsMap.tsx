@@ -203,8 +203,18 @@ function FlyToAndOpen({
             return;
         }
 
+        const openPopup = () => {
+            markerRef?.current?.openPopup();
+        };
+        const fallbackId = window.setTimeout(openPopup, 2200);
+
         map.flyTo(coords, 8, { duration: 2 });
-        markerRef?.current?.openPopup();
+        map.once("moveend", openPopup);
+
+        return () => {
+            window.clearTimeout(fallbackId);
+            map.off("moveend", openPopup);
+        };
     }, [coords, map, markerRef]);
 
     return null;
