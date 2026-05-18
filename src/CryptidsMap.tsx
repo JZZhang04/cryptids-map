@@ -197,12 +197,16 @@ function FlyToAndOpen({
     markerRef: React.RefObject<L.Marker | null> | null;
 }) {
     const map = useMap();
-    if (coords) {
-        map.flyTo(coords, 8, { duration: 2 });
-        if (markerRef?.current) {
-            markerRef.current.openPopup();
+
+    useEffect(() => {
+        if (!coords) {
+            return;
         }
-    }
+
+        map.flyTo(coords, 8, { duration: 2 });
+        markerRef?.current?.openPopup();
+    }, [coords, map, markerRef]);
+
     return null;
 }
 
