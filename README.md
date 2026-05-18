@@ -2,6 +2,7 @@
 
 A map-based field journal for folklore, monster stories, regional sightings, and the strange creatures people swear they almost definitely saw.
 
+Demo site: https://jzzhang04.github.io/cryptids-map/
 
 This project turns the United States (and the whole world later)into a browsable cryptid atlas: part campfire archive, part interactive map, part playful reminder that not every “eyewitness account” should be mistaken for zoology. Most cryptids are best understood as folklore, misidentification, exaggeration, or cultural storytelling rather than scientifically verified animals, and this app leans into that mystery with curiosity instead of pretending to be a lab report.
 
